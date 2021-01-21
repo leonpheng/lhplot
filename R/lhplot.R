@@ -454,6 +454,113 @@ histogram.cwres(data)
 dev.off()
 }
 
+#' Individual plots
+#'
+#' Generate GOF
+#' @param data Data frame
+#' @param output.name Listing is generated in word document.
+#' @keywords lh_indiv_plot
+#' @export
+#' @examples plh_indiv_plot(data=dat1,id="usubjid",n.plots.page=9,time="time",dv="dv",ipred="ipred"#' #' @examples ,pred="pred",type="linear",
+#' @examples xtit="Time after first dose (h)",
+#' @examplesytit="Concentration (ng/mL)",output.name="Individiual.docx")
+
+lh_indiv_plot<-function(data=dat1,id="usubjid",n.plots.page=9,time="time",dv="dv",ipred="ipred",pred="pred",type="linear",xtit="Time after first dose (h)",ytit="Concentration (ng/mL)",output.name="./test.docx")
+  {
+  library(scales)
+  library(ggplot2)
+  npepage<-n.plots.page
+  n<-length(unique(data[,id]))
+  page<-1:ceiling(n/npepage)
+  nb_pg2<-page*9
+  nb_pg1<-c(1,nb_pg2[1:(length(nb_pg2)-1)]+1)
+  head(dat1)
+
+  doc<-officer::read_docx()
+  for(i in 1:length(nb_pg2)){
+    ddat<-data[data[,id]%in%unique(data[,id])[nb_pg1[i]:nb_pg2[i]],]
+    ddat$usubjid<-ddat[,id]
+    break2<-c(0.0001,0.0005,0.001,0.005,0.1,0.5,1,5,10,100,10^3,10^4,10^5,10^6)
+  p<-ggplot2::ggplot(ddat,aes_string(x=time,y=dv))+
+      ggplot2::geom_point(aes(col="Observed"))
+    if(!is.null(ipred)){
+      p<-p+ggplot2::geom_line(aes(y=ipred,col="IPRED"))
+    }
+    if(!is.null(pred)){
+      p<-p+ggplot2::geom_line(aes(y=pred,col="PRED"))
+    }
+    p<-p+ggplot2::facet_wrap(~usubjid,scales="free")
+    if(type=="log"){
+    p=p+ ggplot2::scale_y_log10(breaks = break2)}
+    p=p+ ggplot2::scale_x_continuous()+
+      ggplot2::xlab(xtit)+ggplot2::ylab(ytit)+
+      ggplot2::theme_bw()+
+      ggplot2::theme(legend.title=element_blank())
+
+    doc<-officer::body_add_gg(doc,p,width=7.08,height=5.9)
+  }
+  if(!is.null(output.name)){
+  print(doc,output.name)}else{doc}
+}
+
+
+#' EXPLORATORY Individual plots
+#'
+#' Generate DATA
+#' @param data Data frame
+#' @param output.name Listing is generated in word document.
+#' @keywords lh_indiv_plot
+#' @export
+#' @examples lh_explor_ind(data=dat1,id="usubjid",n.plots.page=9,time="time",dv="dv",ipred="ipred"#' #' @examples ,pred="pred",type="linear",
+#' @examples xtit="Time after first dose (h)",
+#' @examplesytit="Concentration (ng/mL)",output.name="Individiual.docx")
+
+lh_explor_ind<-function(data=dat,dose="amt",id="id",n.plots.page=9,time="time",dv="dv",ipred=NULL,pred=NULL,type="linear",xtit="Time after first dose (h)",ytit="Concentration (ng/mL)",output.name="./test.docx")
+{
+  data[,dose][!is.na(data[,dose])&data[,dose]==0]<-NA
+  data[,dv][!is.na(data[,dose])]<-NA
+  head(data)
+  library(scales)
+  library(ggplot2)
+  npepage<-n.plots.page
+  n<-length(unique(data[,id]))
+  page<-1:ceiling(n/npepage)
+  nb_pg2<-page*9
+  nb_pg1<-c(1,nb_pg2[1:(length(nb_pg2)-1)]+1)
+  head(data)
+
+  doc<-officer::read_docx()
+  for(i in 1:length(nb_pg2)){
+    ddat<-data[data[,id]%in%unique(data[,id])[nb_pg1[i]:nb_pg2[i]],]
+    ddat$usubjid<-ddat[,id]
+ddat<-dplyr::left_join(ddat,lhtool2::addvar(ddat[!is.na(ddat[,dv])&ddat[,dv]>0,c(id,dv)],id,dv,"min(x)/2","no","dose"))
+  ddat$time<-ddat[,time]
+    break2<-c(0.0001,0.0005,0.001,0.005,0.1,0.5,1,5,10,100,10^3,10^4,10^5,10^6)
+p<-ggplot2::ggplot(ddat[is.na(ddat$amt),],aes_string(x=time,y=dv))+
+      ggplot2::geom_point(aes(col="Observed"))+
+      ggplot2::geom_line()
+    if(!is.null(ipred)){
+      p<-p+ggplot2::geom_line(aes(y=ipred,linetype="IPRED"),col="blue")
+    }
+    if(!is.null(pred)){
+      p<-p+ggplot2::geom_line(aes(y=pred,linetype="PRED"),col="red")
+    }
+    p<-p+ggplot2::geom_point(data=ddat[!is.na(ddat$amt),],aes(x=time,y=dose,col="Dose"),shape=17)
+    p<-p+ggplot2::facet_wrap(~usubjid,scales="free")
+    if(type=="log"){
+      p=p+ ggplot2::scale_y_log10(breaks = break2)}
+    p=p+ ggplot2::scale_x_continuous()+
+      ggplot2::xlab(xtit)+ggplot2::ylab(ytit)+
+      ggplot2::theme_bw()+
+      ggplot2::theme(legend.title=element_blank())
+
+    doc<-officer::body_add_gg(doc,p,width=7.08,height=5.9)
+  }
+  if(!is.null(output.name)){
+    print(doc,output.name)}else{doc}
+}
+
+
 ##########################################################################################################################
 #' CONTINUOUS GP EXTERNAL FUNCTION FOR INTERNAL USE
 #'
