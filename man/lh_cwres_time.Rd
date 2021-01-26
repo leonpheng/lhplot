@@ -16,7 +16,9 @@ lh_cwres_time(
   TADN = "Time After Dose (h)",
   RTIMEN = "Time After First Dose (h)",
   IVARN = "Time After First Dose (h)",
-  CWRESN = "Conditional Weighted Residuals"
+  CWRESN = "Conditional Weighted Residuals",
+  col.obs = "#A6CEE3",
+  col.ident = "#1F78B4"
 )
 }
 \arguments{

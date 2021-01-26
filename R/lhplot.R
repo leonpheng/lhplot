@@ -17,7 +17,8 @@ lh_dv_ipred<-function(data,y="DV",
               TADN="Time After Dose (h)",
               RTIMEN="Time After First Dose (h)",
               IVARN="Time After First Dose (h)",
-              CWRESN="Conditional Weighted Residuals"
+              CWRESN="Conditional Weighted Residuals",
+              col.obs="#A6CEE3",col.ident="#1F78B4"
 ){
   r<-data[,c(x,y)]
   names(r)<-c("x","y")
@@ -31,8 +32,8 @@ if(min(limx)==0){
     limx1 <-c(10^floor(log10(scale[1])),10^ceiling(log10(scale[2])))
   }
 
-cols <- c("Observed"="#A6CEE3")
-cols1 <- c("Identity"="#1F78B4")
+cols <- c("Observed"=col.obs)
+cols1 <- c("Identity"=col.ident)
 
 p<-ggplot2::ggplot(r,aes(x=x,y=y))+
   geom_point(aes(col="Observed"))+
@@ -68,7 +69,8 @@ lh_dv_pred<-function(data=dat1,y="DV",
                       TADN="Time After Dose (h)",
                       RTIMEN="Time After First Dose (h)",
                       IVARN="Time After First Dose (h)",
-                      CWRESN="Conditional Weighted Residuals"
+                      CWRESN="Conditional Weighted Residuals",
+                     col.obs="#A6CEE3",col.ident="#1F78B4"
 ){
   r<-data[,c(x,y)]
   names(r)<-c("x","y")
@@ -82,8 +84,8 @@ lh_dv_pred<-function(data=dat1,y="DV",
         limx1 <-c(10^floor(log10(scale[1])),10^ceiling(log10(scale[2])))
       }
 
-  cols <- c("Observed"="#A6CEE3")
-  cols1 <- c("Identity"="#1F78B4")
+  cols <- c("Observed"=col.obs)
+  cols1 <- c("Identity"=col.ident)
 
   p<-ggplot2::ggplot(r,aes(x=x,y=y))+
     geom_point(aes(col="Observed"))+
@@ -120,7 +122,8 @@ lh_cwres_tad<-function(data=dat1,y="CWRES",
                      TADN="Time After Dose (h)",
                      RTIMEN="Time After First Dose (h)",
                      IVARN="Time After First Dose (h)",
-                     CWRESN="Conditional Weighted Residuals"
+                     CWRESN="Conditional Weighted Residuals",
+                     col.obs="#A6CEE3",col.ident="#1F78B4"
 ){
   r<-data[,c(x,y)]
   names(r)<-c("x","y")
@@ -134,8 +137,8 @@ lh_cwres_tad<-function(data=dat1,y="CWRES",
         limx1 <-c(10^floor(log10(scale[1])),10^ceiling(log10(scale[2])))
       }
 
-  cols <- c("Observed"="#A6CEE3")
-  cols1 <- c("Identity"="#1F78B4")
+  cols <- c("Observed"=col.obs)
+  cols1 <- c("Identity"=col.ident)
 
   p<-ggplot2::ggplot(r,aes(x=x,y=y))+
     geom_point(aes(col="Observed"))+
@@ -170,7 +173,8 @@ lh_cwres_time<-function(data=dat1,y="CWRES",
                        TADN="Time After Dose (h)",
                        RTIMEN="Time After First Dose (h)",
                        IVARN="Time After First Dose (h)",
-                       CWRESN="Conditional Weighted Residuals"
+                       CWRESN="Conditional Weighted Residuals",
+                       col.obs="#A6CEE3",col.ident="#1F78B4"
 ){
   r<-data[,c(x,y)]
   names(r)<-c("x","y")
@@ -184,8 +188,8 @@ lh_cwres_time<-function(data=dat1,y="CWRES",
         limx1 <-c(10^floor(log10(scale[1])),10^ceiling(log10(scale[2])))
       }
 
-  cols <- c("Observed"="#A6CEE3")
-  cols1 <- c("Identity"="#1F78B4")
+  cols <- c("Observed"=col.obs)
+  cols1 <- c("Identity"=col.ident)
 
   p<-ggplot2::ggplot(r,aes(x=x,y=y))+
     geom_point(aes(col="Observed"))+
@@ -218,7 +222,8 @@ lh_cwres_pred<-function(data=dat1,y="CWRES",
                         TADN="Time After Dose (h)",
                         RTIMEN="Time After First Dose (h)",
                         IVARN="Time After First Dose (h)",
-                        CWRESN="Conditional Weighted Residuals"
+                        CWRESN="Conditional Weighted Residuals",
+                        col.obs="#A6CEE3",col.ident="#1F78B4"
 ){
   r<-data[,c(x,y)]
   names(r)<-c("x","y")
@@ -232,8 +237,8 @@ lh_cwres_pred<-function(data=dat1,y="CWRES",
         limx1 <-c(10^floor(log10(scale[1])),10^ceiling(log10(scale[2])))
       }
 
-  cols <- c("Observed"="#A6CEE3")
-  cols1 <- c("Identity"="#1F78B4")
+  cols <- c("Observed"=col.obs)
+  cols1 <- c("Identity"=col.ident)
 
   p<-ggplot2::ggplot(r,aes(x=x,y=y))+
     geom_point(aes(col="Observed"))+
@@ -447,12 +452,17 @@ histogram.cwres <- function(dat, ...) {
 #' @examples
 lh_cwres_dist<-function(data=r,cwres="cwres",file.name="dist_QQ_CWRES.png"){
 names(data)[names(data)==cwres]<-"cwres"
+
+  par(mfrow = c(1, 2))
+  qqplot.cwres(data)
+  histogram.cwres(data)
+
 png(file =file.name , width = 8, height = 6, units = 'in', res = 300)
 par(mfrow = c(1, 2))
 qqplot.cwres(data)
 histogram.cwres(data)
-dev.off()
-}
+dev.off()}
+
 
 #' Individual plots
 #'
