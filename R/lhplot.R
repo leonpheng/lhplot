@@ -324,8 +324,8 @@ lh_cat_cov<-function(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL,fancy="
       dcat$varlead<-dcat$variable
       dcat$variable<-gsub("eta","",tolower(dcat$variable))
       dcat$variable<-paste0("\U03B7",toupper(dcat$variable))
-    }
-    dcat<-lhfactor(dcat,"varlead","variable")
+      dcat<-lhfactor(dcat,"varlead","variable")
+    }else{dcat<-lhfactor(dcat,"variable","variable")}
 
     p<-ggplot2::ggplot(dcat,aes(x=Cat1,y=value))+
       geom_boxplot(outlier.shape = NA)+
