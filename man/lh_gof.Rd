@@ -13,7 +13,7 @@ lh_gof(file.name = NULL)
 Generate GOF1
 }
 \examples{
-p1<-lh_gof("test.png")
-p2<-lh_gof()
+lh_gof("test.png")
+lh_gof()
 }
 \keyword{lh_gof}

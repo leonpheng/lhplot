@@ -260,8 +260,8 @@ lh_cwres_pred<-function(data=dat1,y="CWRES",
 #' @param data data frame
 #' @keywords lh_gof
 #' @export
-#' @examples p1<-lh_gof("test.png")
-#' @examples p2<-lh_gof()
+#' @examples lh_gof("test.png")
+#' @examples lh_gof()
 
 lh_gof<-function(file.name=NULL){
 p1<-lh_dv_ipred(dat1,type="lin",IPREDN="IPRED")
@@ -352,7 +352,6 @@ lh_cat_cov<-function(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL,fancy="
 #' @keywords lh_con_cov
 #' @export
 #' @examples p1<-lh_con_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
-#' @examples
 
 lh_con_cov<-function(data=coneta,lst.eta=keta,lst.cov=conv,save.path="./scatter.png",fancy="yes"){
 
@@ -381,7 +380,7 @@ png(save.path,width=768,height=768,pointsize = 16)
 #' @keywords lh_con_cov
 #' @export
 #' @examples p1<-lh_con_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
-#' @examples
+
 lh_eta_dist<-function(data=r,lst.eta=c("ETACL","ETAVC","ETAV2","ETAQ"),ncol=3,nrow=2,fancy="yes"){
   if(!is.null(fancy)){
     xname<-gsub("ETA","",toupper(lst.eta))
@@ -412,7 +411,7 @@ ggarrange(plotlist = myplots,ncol=ncol, nrow=nrow, common.legend = TRUE, legend=
 #' @keywords qqplot.cwres
 #' @export
 #' @examples p1<-lh_con_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
-#' @examples
+
 qqplot.cwres <- function(dat, ...) {
   ylim <-c(-10, 10)
   xlim <-c(-4, 4)
@@ -429,7 +428,7 @@ qqplot.cwres <- function(dat, ...) {
 #' @keywords histogram.cwres
 #' @export
 #' @examples p1<-lh_con_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
-#' @examples
+
 histogram.cwres <- function(dat, ...) {
   ylim <-c(0, 0.55)
   xlab <- "Conditional Weighted Residuals"
@@ -446,7 +445,7 @@ histogram.cwres <- function(dat, ...) {
 #' @keywords lh_cwres_dist
 #' @export
 #' @examples p1<-lh_con_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
-#' @examples
+
 lh_cwres_dist<-function(data=r,cwres="cwres",file.name="dist_QQ_CWRES.png"){
 names(data)[names(data)==cwres]<-"cwres"
 
@@ -575,8 +574,7 @@ p<-ggplot2::ggplot(ddat[is.na(ddat$amt),],aes_string(x=time,y=dv))+
 #' @param x not to be used internally. Could be downloaded from Github
 #' @keywords gpair
 #' @export
-#' @examples
-#' @examples
+
 
 gpairs<-function (x, upper.pars = list(scatter = "points", conditional = "barcode",
                                        mosaic = "mosaic"), lower.pars = list(scatter = "points",
