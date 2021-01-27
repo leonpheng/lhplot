@@ -4,7 +4,7 @@
 \alias{histogram.cwres}
 \title{DISTRIBUTION OF CWRES internal}
 \usage{
-histogram.cwres(dat, ...)
+\method{histogram}{cwres}(dat, ...)
 }
 \arguments{
 \item{data}{Data frame, merged ETA and COVAR data}

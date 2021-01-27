@@ -290,9 +290,10 @@ p
 #' @export
 #' @examples p1<-lh_cat_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
 #' @examples p2<-lh_gof()
-
 lh_cat_cov<-function(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL,fancy="yes"){
   cat1<-lhlong(data,lst.cov)
+  cca<-lst.cov
+  keta<-lst.eta
   names(cat1)[names(cat1)=="variable"]<-"Covariate"
   names(cat1)[names(cat1)=="value"]<-"Categorical"
   cat1<-chclass(cat1,c("Covariate","Categorical"),"char")
@@ -300,28 +301,32 @@ lh_cat_cov<-function(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL,fancy="
   cat1$Cat1<-paste0(cat1$Categorical,"\n (n=",cat1$count,")")
   cat1<-lhlong(cat1,lst.eta)
   head(cat1)
+  cat1<-reflag(cat1,"variable",lst.eta)
   cat1<-chclass(cat1,c("Covariate","Categorical","variable"),"char")
   unique(cat1$Categorical)
   head(cat1)
-
+  cateta<-data
   cat1$variable<-factor(cat1$variable,levels=lst.eta)
+  cat1<-cat1[order(cat1$variable),]
   catnum<-addvar(nodup(cat1,c("Covariate","Categorical"),"var"),"Covariate","Categorical","length(x)","no","catnumber")
-
   for(i in cca[cca%in%catnum$Covariate[catnum$catnumber>0]]){
     def1$VARN<-tolower(def1$VARN)
     z<-def1$LABEL[def1$VARN==i]
-    head(cateta)
+    unique(cateta[, i])
     dcat<-cat1[cat1$Covariate%in%i,]
     ord<-sort(unique(cateta[,i]))
     label<-nodup(dcat,c("Categorical","Cat1"),"var")
     label$Categorical<-factor(label$Categorical,levels=ord)
     lablel<-label$Cat1[order(label$Categorical)]
     dcat$Cat1<-factor(dcat$Cat1,levels=lablel)
-head(dcat)
-if(!is.null(fancy)){
-  dcat$variable<-gsub("eta","",tolower(dcat$variable))
-  dcat$variable<-paste0("\U03B7",toupper(dcat$variable))
-}
+
+    if(!is.null(fancy)){
+      dcat$varlead<-dcat$variable
+      dcat$variable<-gsub("eta","",tolower(dcat$variable))
+      dcat$variable<-paste0("\U03B7",toupper(dcat$variable))
+    }
+    dcat<-lhfactor(dcat,"varlead","variable")
+
     p<-ggplot2::ggplot(dcat,aes(x=Cat1,y=value))+
       geom_boxplot(outlier.shape = NA)+
       geom_jitter(position=position_jitter(0.1),col="grey")+
@@ -349,7 +354,7 @@ if(!is.null(fancy)){
 #' @examples p1<-lh_con_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
 #' @examples
 
-lh_con_cov<-function(data=coneta,lst.eta=keta,lst.cov=conv,save.path="./",fancy="yes"){
+lh_con_cov<-function(data=coneta,lst.eta=keta,lst.cov=conv,save.path="./scatter.png",fancy="yes"){
 
   if(!is.null(fancy)){
     names(data)[names(data)%in%lst.eta]<-gsub("ETA","",toupper(names(data)[names(data)%in%lst.eta]))
@@ -357,23 +362,15 @@ lh_con_cov<-function(data=coneta,lst.eta=keta,lst.cov=conv,save.path="./",fancy=
     names(data)[names(data)%in%lst.eta]<-paste0("\U03B7",toupper(names(data)[names(data)%in%lst.eta]))
     lst.eta<-paste0("\U03B7",lst.eta)
   }
-if(!is.null(save.path)){
-nm<-paste0(save.path,"scatter.png")
-png(file=nm,width=768,height=768,pointsize = 16)
+
+png(save.path,width=768,height=768,pointsize = 16)
  print(gpairs(x=data[,c(lst.eta,lst.cov)],
                upper.pars = list(conditional = 'boxplot', scatter = 'loess'),
                lower.pars = list(scatter = 'stats',conditional = "barcode"),
                diag.pars = list(fontsize = 9, show.hist = TRUE, hist.color = "gray"),
                stat.pars =list(fontsize = 11, signif =F, verbose =T, use.color = TRUE, missing = 'missing', just = 'centre'),
                scatter.pars = list(pch = 20)))
- dev.off()}else{
-   print(gpairs(x=data[,c(lst.eta,lst.cov)],
-                upper.pars = list(conditional = 'boxplot', scatter = 'loess'),
-                lower.pars = list(scatter = 'stats',conditional = "barcode"),
-                diag.pars = list(fontsize = 9, show.hist = TRUE, hist.color = "gray"),
-                stat.pars =list(fontsize = 11, signif =F, verbose =T, use.color = TRUE, missing = 'missing', just = 'centre'),
-                scatter.pars = list(pch = 20)))
- }}
+ dev.off()}
 
 ####ETA DISTRIBUTION
 #' DISTRIBUTION OF ETA

@@ -8,7 +8,7 @@ lh_con_cov(
   data = coneta,
   lst.eta = keta,
   lst.cov = conv,
-  save.path = "./",
+  save.path = "./scatter.png",
   fancy = "yes"
 )
 }
