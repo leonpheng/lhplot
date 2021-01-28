@@ -358,7 +358,7 @@ lh_cat_cov<-function(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL,fancy="
 #' @examples p1<-lh_con_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
 
 lh_con_cov<-function(data=coneta,lst.eta=keta,lst.cov=conv,save.path="./scatter.png",fancy="yes"){
-
+  library(ggpubr)
   if(!is.null(fancy)){
     names(data)[names(data)%in%lst.eta]<-gsub("ETA","",names(data)[names(data)%in%lst.eta])
     lst.eta<-gsub("ETA","",lst.eta)
