@@ -291,53 +291,55 @@ p
 #' @examples p1<-lh_cat_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
 #' @examples p2<-lh_gof()
 lh_cat_cov<-function(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL,fancy="yes"){
-  cat1<-lhlong(data,lst.cov)
-  cca<-lst.cov
-  keta<-lst.eta
-  names(cat1)[names(cat1)=="variable"]<-"Covariate"
-  names(cat1)[names(cat1)=="value"]<-"Categorical"
-  cat1<-chclass(cat1,c("Covariate","Categorical"),"char")
-  cat1<-addvar(cat1,c("Covariate","Categorical"),keta[1],"length(x)","yes","count")
-  cat1$Cat1<-paste0(cat1$Categorical,"\n (n=",cat1$count,")")
-  cat1<-lhlong(cat1,lst.eta)
+  cat1 <- lhlong(data, lst.cov)
+  names(cat1)[names(cat1) == "variable"] <- "Covariate"
+  names(cat1)[names(cat1) == "value"] <- "Categorical"
+  cat1 <- chclass(cat1, c("Covariate", "Categorical"), "char")
+  cat1 <- addvar(cat1, c("Covariate", "Categorical"), keta[1],
+                 "length(x)", "yes", "count")
+  cat1$Cat1 <- paste0(cat1$Categorical, "\n (n=", cat1$count,
+                      ")")
+  cat1 <- lhlong(cat1, lst.eta)
   head(cat1)
-  cat1<-reflag(cat1,"variable",lst.eta)
-  cat1<-chclass(cat1,c("Covariate","Categorical","variable"),"char")
+  cat1 <- chclass(cat1, c("Covariate", "Categorical", "variable"),
+                  "char")
   unique(cat1$Categorical)
   head(cat1)
-  cateta<-data
-  cat1$variable<-factor(cat1$variable,levels=lst.eta)
-  cat1<-cat1[order(cat1$variable),]
-  catnum<-addvar(nodup(cat1,c("Covariate","Categorical"),"var"),"Covariate","Categorical","length(x)","no","catnumber")
-  for(i in cca[cca%in%catnum$Covariate[catnum$catnumber>0]]){
-    def1$VARN<-tolower(def1$VARN)
-    z<-def1$LABEL[def1$VARN==i]
-    unique(cateta[, i])
-    dcat<-cat1[cat1$Covariate%in%i,]
-    ord<-sort(unique(cateta[,i]))
-    label<-nodup(dcat,c("Categorical","Cat1"),"var")
-    label$Categorical<-factor(label$Categorical,levels=ord)
-    lablel<-label$Cat1[order(label$Categorical)]
-    dcat$Cat1<-factor(dcat$Cat1,levels=lablel)
+  cat1$variable <- factor(cat1$variable, levels = lst.eta)
+  catnum <- addvar(nodup(cat1, c("Covariate", "Categorical"),
+                         "var"), "Covariate", "Categorical", "length(x)", "no",
+                   "catnumber")
+  for (i in lst.cov[lst.cov %in%catnum$Covariate[catnum$catnumber >
+                                                 0]]) {
+    #def1$VARN <- tolower(def1$VARN)
+    #z <- def1$LABEL[def1$VARN == i]
 
-    if(!is.null(fancy)){
-      dcat$varlead<-dcat$variable
-      dcat$variable<-gsub("eta","",tolower(dcat$variable))
-      dcat$variable<-paste0("\U03B7",toupper(dcat$variable))
-      dcat<-lhfactor(dcat,"varlead","variable")
-    }else{dcat<-lhfactor(dcat,"variable","variable")}
+    dcat <- cat1[cat1$Covariate %in% i, ]
+    ord <- sort(unique(data[, i]))
+    label <- nodup(dcat, c("Categorical", "Cat1"), "var")
+    label$Categorical <- factor(label$Categorical, levels = ord)
+    lablel <- label$Cat1[order(label$Categorical)]
+    dcat$Cat1 <- factor(dcat$Cat1, levels = lablel)
+    head(dcat)
+    if (!is.null(fancy)) {
+      dcat$variable1 <- gsub("eta", "", tolower(dcat$variable))
+      dcat$variable1 <- paste0("\U03B7", toupper(dcat$variable1))
+      dcat<-lhfactor(dcat,"variable","variable1")
+    }
 
-    p<-ggplot2::ggplot(dcat,aes(x=Cat1,y=value))+
-      geom_boxplot(outlier.shape = NA)+
-      geom_jitter(position=position_jitter(0.1),col="grey")+
-      geom_hline(yintercept=0,linetype=2, color="red",size=1)+
-      ylab("Individual Random Effect")+xlab("")+
-      facet_wrap(~variable,scale="free",ncol=2)+
-      theme_bw()+
-      theme(axis.text.x = element_text(angle =45, hjust =0.1, vjust = 0.4,size=10))
-    if(!is.null(save.path)){
-      nm<-paste0(save.path,z,"_boxplot.png")
-      ggsave(nm,p,width=12,height=12)}else{p}
+    p <- ggplot2::ggplot(dcat, aes(x = Cat1, y = value)) +
+      geom_boxplot(outlier.shape = NA) + geom_jitter(position = position_jitter(0.1),
+                                                     col = "grey") + geom_hline(yintercept = 0, linetype = 2,
+                                                                                color = "red", size = 1) + ylab("Individual Random Effect") +
+      xlab("") + facet_wrap(~variable1, scale = "free",
+                            ncol = 2) + theme_bw() + theme(axis.text.x = element_text(angle = 45,
+                                                                                      hjust = 0.1, vjust = 0.4, size = 10))
+    if (!is.null(save.path)) {
+      nm <- paste0(save.path, z, "_boxplot.png")
+      ggsave(nm, p, width = 12, height = 12)
+    }else {
+      p
+    }
   }
   p
 }
