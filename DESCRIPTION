@@ -9,4 +9,3 @@ Authors@R:
            comment = c(ORCID = "YOUR-ORCID-ID"))
 Description: What the package does (one paragraph).
 RoxygenNote: 7.1.1
-

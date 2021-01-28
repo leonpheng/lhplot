@@ -423,6 +423,8 @@ qqplot.cwres <- function(dat, ...) {
   with(dat, qqline(cwres))
   abline(a=0,b=1,col="red") #add the standard normal qqplot
 }
+
+
 #' DISTRIBUTION OF CWRES internal
 #'
 #' Generate GOF
@@ -431,7 +433,7 @@ qqplot.cwres <- function(dat, ...) {
 #' @export
 #' @examples p1<-lh_con_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
 
-histogram.cwres <- function(dat, ...) {
+hist.cwres <- function(dat, ...) {
   ylim <-c(0, 0.55)
   xlab <- "Conditional Weighted Residuals"
   with(dat, hist(cwres, ylim=ylim, xlab=xlab, main="", freq=FALSE, ...))
@@ -451,14 +453,10 @@ histogram.cwres <- function(dat, ...) {
 lh_cwres_dist<-function(data=r,cwres="cwres",file.name="dist_QQ_CWRES.png"){
 names(data)[names(data)==cwres]<-"cwres"
 
-  par(mfrow = c(1, 2))
-  qqplot.cwres(data)
-  histogram.cwres(data)
-
 png(file =file.name , width = 8, height = 6, units = 'in', res = 300)
 par(mfrow = c(1, 2))
 qqplot.cwres(data)
-histogram.cwres(data)
+hist.cwres(data)
 dev.off()}
 
 
