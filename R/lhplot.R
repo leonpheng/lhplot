@@ -362,7 +362,7 @@ lh_con_cov<-function(data=coneta,lst.eta=keta,lst.cov=conv,save.path="./scatter.
   if(!is.null(fancy)){
     names(data)[names(data)%in%lst.eta]<-gsub("ETA","",names(data)[names(data)%in%lst.eta])
     lst.eta<-gsub("ETA","",lst.eta)
-    names(data)[names(data)%in%lst.eta]<-paste0("\U03B7",toupper(names(data)[names(data)%in%lst.eta]))
+    names(data)[names(data)%in%lst.eta]<-paste0("\U03B7",names(data)[names(data)%in%lst.eta])
     lst.eta<-paste0("\U03B7",lst.eta)
   }
 
