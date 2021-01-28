@@ -291,16 +291,7 @@ p
 #' @examples p1<-lh_cat_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
 #' @examples p2<-lh_gof()
 lh_cat_cov<-function(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL,fancy="yes"){
-  cat1 <- lhlong(data, lst.cov)
-  names(cat1)[names(cat1) == "variable"] <- "Covariate"
-  names(cat1)[names(cat1) == "value"] <- "Categorical"
-  cat1 <- chclass(cat1, c("Covariate", "Categorical"), "char")
-  cat1 <- addvar(cat1, c("Covariate", "Categorical"), keta[1],
-                 "length(x)", "yes", "count")
-  cat1$Cat1 <- paste0(cat1$Categorical, "\n (n=", cat1$count,
-                      ")")
   cat1 <- lhlong(cat1, lst.eta)
-  head(cat1)
   cat1 <- chclass(cat1, c("Covariate", "Categorical", "variable"),
                   "char")
   unique(cat1$Categorical)
@@ -322,8 +313,8 @@ lh_cat_cov<-function(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL,fancy="
     dcat$Cat1 <- factor(dcat$Cat1, levels = lablel)
     head(dcat)
     if (!is.null(fancy)) {
-      dcat$variable1 <- gsub("eta", "", tolower(dcat$variable))
-      dcat$variable1 <- paste0("\U03B7", toupper(dcat$variable1))
+      dcat$variable1 <- gsub("ETA", "", dcat$variable)
+      dcat$variable1 <- paste0("\U03B7",dcat$variable1)
       dcat<-lhfactor(dcat,"variable","variable1")
     }
 
@@ -358,8 +349,8 @@ lh_cat_cov<-function(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL,fancy="
 lh_con_cov<-function(data=coneta,lst.eta=keta,lst.cov=conv,save.path="./scatter.png",fancy="yes"){
 
   if(!is.null(fancy)){
-    names(data)[names(data)%in%lst.eta]<-gsub("ETA","",toupper(names(data)[names(data)%in%lst.eta]))
-    lst.eta<-gsub("ETA","",toupper(lst.eta))
+    names(data)[names(data)%in%lst.eta]<-gsub("ETA","",names(data)[names(data)%in%lst.eta])
+    lst.eta<-gsub("ETA","",lst.eta)
     names(data)[names(data)%in%lst.eta]<-paste0("\U03B7",toupper(names(data)[names(data)%in%lst.eta]))
     lst.eta<-paste0("\U03B7",lst.eta)
   }
