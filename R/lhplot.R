@@ -291,7 +291,18 @@ p
 #' @examples p1<-lh_cat_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
 #' @examples p2<-lh_gof()
 lh_cat_cov<-function(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL,fancy="yes"){
+  cat1 <- lhlong(data, lst.cov)
+  names(cat1)[names(cat1) == "variable"] <- "Covariate"
+  names(cat1)[names(cat1) == "value"] <- "Categorical"
+  cat1 <- chclass(cat1, c("Covariate", "Categorical"), "char")
+  cat1 <- addvar(cat1, c("Covariate", "Categorical"), lst.eta[1],
+                 "length(x)", "yes", "count")
+
+  cat1$Cat1 <- paste0(cat1$Categorical, "\n (n=", cat1$count,
+                      ")")
+
   cat1 <- lhlong(cat1, lst.eta)
+  # head(cat1)
   cat1 <- chclass(cat1, c("Covariate", "Categorical", "variable"),
                   "char")
   unique(cat1$Categorical)
