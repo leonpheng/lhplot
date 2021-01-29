@@ -1,3 +1,65 @@
+#' DV vs X with STRAT
+#'
+#' Generate GOF1
+#' @param data data frame
+#' @keywords lh_dv_ipred
+#' @export
+#' @examples p1<-lh_dv_ipred(dat1,type="lin",IPREDN="IPRED")
+#' @examples p2<-lh_dv_ipred(dat1,type="log")
+lh_dv_x<-function(data,y="DV",
+                      x="IPRED",type="log",scale=c(0.1,100),
+                      IPREDN="Individual Predicted Concentration (ng/mL)",
+                      DVN="Observed Concentration (ng/mL)",
+                      col.obs="#A6CEE3",col.ident="#1F78B4",strat=NULL
+){
+
+  if(!is.null(strat)){
+    cw<-data[,c(x,y,strat)]
+    names(cw)<-c("x","y","z")}else{
+      cw<-data[,c(x,y)]
+      names(cw)<-c("x","y")}
+  if("auto"%in%scale){
+    limx <- range(cw$x, cw$y)
+    if(min(limx)==0){
+      limx1 <-c(0.01,10^ceiling(log10(max(limx))))}else{
+        limx1 <-c(10^floor(log10(min(limx))),10^ceiling(log10(max(limx))))
+      }}else{
+        limx <-scale
+        limx1 <-c(10^floor(log10(scale[1])),10^ceiling(log10(scale[2])))
+      }
+
+  cols <- c("Observed"=col.obs)
+  cols1 <- c("Identity"=col.ident)
+  if(!is.null(strat)){
+    p<-ggplot2::ggplot(cw,aes(x=x,y=y))+
+      geom_point(aes(col=factor(z)))+
+      xlab(IPREDN)+ylab(DVN)+
+      geom_abline(slope=1,size=1,col="blue")+
+      geom_line(aes(x=0,y=0,linetype="Identity"))+
+      geom_smooth(method="loess", method.args=list(span=2/3, degree=1, family="symmetric"), se=F,aes(linetype="LOESS"))+
+      #scale_colour_manual(name="",values=cols) +
+      scale_linetype_discrete(name = "")+
+      guides(col=guide_legend(title=strat))+
+      theme_bw()
+  }else{
+  p<-ggplot2::ggplot(cw,aes(x=x,y=y))+
+    geom_point(aes(col="Observed"))+
+    xlab(IPREDN)+ylab(DVN)+
+    geom_abline(slope=1,size=1,col="blue")+
+    geom_line(aes(x=0,y=0,linetype="Identity"))+
+    geom_smooth(method="loess", method.args=list(span=2/3, degree=1, family="symmetric"), se=F,aes(linetype="LOESS"))+
+    scale_colour_manual(name="",values=cols) +
+    scale_linetype_discrete(name = "")+
+    theme_bw()}
+
+  if(type=="lin"){
+    p=p+scale_x_continuous(limits=limx)+scale_y_continuous(limits=limx)
+  }else{
+    p=p+scale_x_log10(limits=limx1)+scale_y_log10(limits=limx1)
+  }
+  p
+}
+
 
 #' DV vs IPRED
 #'
@@ -7,8 +69,6 @@
 #' @export
 #' @examples p1<-lh_dv_ipred(dat1,type="lin",IPREDN="IPRED")
 #' @examples p2<-lh_dv_ipred(dat1,type="log")
-
-
 lh_dv_ipred<-function(data,y="DV",
                  x="IPRED",type="log",scale=c(0.1,100),
               IPREDN="Individual Predicted Concentration (ng/mL)",
@@ -205,6 +265,66 @@ lh_cwres_time<-function(data=dat1,y="CWRES",
   p
 }
 
+#' CWRES vs X with Strat
+#'
+#' Generate GOF1
+#' @param data data frame
+#' @keywords lh_cwres_pred
+#' @export
+#' @examples p1<-lh_cwres_pred(dat1)
+#' @examples p2<-lh_cwres_pred(dat1)
+
+lh_cwres_x<-function(data=dat1,y="CWRES",
+                        x="TIME",type="log",scale=c(0.1,100),
+                        PREDN="Population Predicted Concentration (ng/mL)",
+                        CWRESN="Conditional Weighted Residuals",
+                        col.obs="#A6CEE3",col.ident="#1F78B4",strat=NULL){
+
+  if(!is.null(strat)){
+    cw<-data[,c(x,y,strat)]
+    names(cw)<-c("x","y","z")}else{
+      cw<-data[,c(x,y)]
+      names(cw)<-c("x","y")}
+  if("auto"%in%scale){
+    limx <- range(cw$x, cw$y)
+    if(min(limx)==0){
+      limx1 <-c(0.01,10^ceiling(log10(max(limx))))}else{
+        limx1 <-c(10^floor(log10(min(limx))),10^ceiling(log10(max(limx))))
+      }}else{
+        limx <-scale
+        limx1 <-c(10^floor(log10(scale[1])),10^ceiling(log10(scale[2])))
+      }
+
+  cols <- c("Observed"=col.obs)
+  cols1 <- c("Identity"=col.ident)
+if(!is.null(strat)){
+    p<-ggplot2::ggplot(cw,aes(x=x,y=y))+
+      geom_point(aes(col=factor(z)))+
+      xlab(PREDN)+ylab(CWRESN)+
+      geom_hline(aes(yintercept=0),linetype="solid") +
+      geom_hline(yintercept=c(-4,4,-6,6),linetype = "dashed",col="grey")+
+      geom_smooth(method="loess", method.args=list(span=2/3, degree=1, family="symmetric"), se=F,linetype="dashed")+
+      scale_x_continuous(labels = function(x) format(x, scientific =F))+
+      scale_y_continuous(limits=c(-8,8),breaks=seq(-8,8,2))+
+      scale_linetype_discrete(name = "")+
+      guides(col=guide_legend(title=strat))+
+      theme_bw()
+  }else{
+    p<-ggplot2::ggplot(cw,aes(x=x,y=y))+
+      geom_point(aes(col="Observed"))+
+      xlab(PREDN)+ylab(CWRESN)+
+      geom_hline(aes(yintercept=0),linetype="solid") +
+      geom_hline(yintercept=c(-4,4,-6,6),linetype = "dashed",col="grey")+
+      geom_smooth(method="loess", method.args=list(span=2/3, degree=1, family="symmetric"), se=F,linetype="dashed")+
+      scale_x_continuous(labels = function(x) format(x, scientific =F))+
+      scale_y_continuous(limits=c(-8,8),breaks=seq(-8,8,2))+
+      scale_colour_manual(name="",values=cols) +
+      scale_linetype_discrete(name = "")+
+      theme_bw()
+  }
+p
+}
+
 #' CWRES vs PRED
 #'
 #' Generate GOF1
@@ -240,8 +360,8 @@ lh_cwres_pred<-function(data=dat1,y="CWRES",
   cols1 <- c("Identity"=col.ident)
 
   p<-ggplot2::ggplot(r,aes(x=x,y=y))+
-  geom_point(aes(col="Observed"))+
-  p<-p+xlab(PREDN)+ylab(CWRESN)+
+    geom_point(aes(col="Observed"))+
+   xlab(PREDN)+ylab(CWRESN)+
     geom_hline(aes(yintercept=0),linetype="solid") +
     geom_hline(yintercept=c(-4,4,-6,6),linetype = "dashed",col="grey")+
     geom_smooth(method="loess", method.args=list(span=2/3, degree=1, family="symmetric"), se=F,linetype="dashed")+
@@ -252,6 +372,7 @@ lh_cwres_pred<-function(data=dat1,y="CWRES",
     theme_bw()
   p
 }
+
 
 #' SAVE BATCH PLOTS
 #'
