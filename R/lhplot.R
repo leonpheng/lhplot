@@ -223,8 +223,7 @@ lh_cwres_pred<-function(data=dat1,y="CWRES",
                         RTIMEN="Time After First Dose (h)",
                         IVARN="Time After First Dose (h)",
                         CWRESN="Conditional Weighted Residuals",
-                        col.obs="#A6CEE3",col.ident="#1F78B4"
-){
+                        col.obs="#A6CEE3",col.ident="#1F78B4"){
   r<-data[,c(x,y)]
   names(r)<-c("x","y")
   if("auto"%in%scale){
@@ -241,8 +240,8 @@ lh_cwres_pred<-function(data=dat1,y="CWRES",
   cols1 <- c("Identity"=col.ident)
 
   p<-ggplot2::ggplot(r,aes(x=x,y=y))+
-    geom_point(aes(col="Observed"))+
-    xlab(PREDN)+ylab(CWRESN)+
+  geom_point(aes(col="Observed"))+
+  p<-p+xlab(PREDN)+ylab(CWRESN)+
     geom_hline(aes(yintercept=0),linetype="solid") +
     geom_hline(yintercept=c(-4,4,-6,6),linetype = "dashed",col="grey")+
     geom_smooth(method="loess", method.args=list(span=2/3, degree=1, family="symmetric"), se=F,linetype="dashed")+
@@ -327,7 +326,8 @@ lh_cat_cov<-function(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL,fancy="
       dcat$variable1 <- gsub("ETA", "", dcat$variable)
       dcat$variable1 <- paste0("\U03B7",dcat$variable1)
       dcat<-lhfactor(dcat,"variable","variable1")
-    }
+    }else{dcat$variable1<-dcat$variable}
+
 
     p <- ggplot2::ggplot(dcat, aes(x = Cat1, y = value)) +
       geom_boxplot(outlier.shape = NA) + geom_jitter(position = position_jitter(0.1),
