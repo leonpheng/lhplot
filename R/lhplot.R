@@ -467,34 +467,6 @@ lh_cat_cov<-function(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL,fancy="
   p
 }
 
-#############################################
-#' CONTINUOUS SCATTER vs ETA
-#'
-#' Generate COVAR
-#' @param data Data frame, merged ETA and COVAR data
-#' @param lst.eta List of ETA names
-#' @param lst.cov List of covariate names. Add plot name to save.path
-#' @keywords lh_con_cov
-#' @export
-#' @examples p1<-lh_con_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
-
-lh_con_cov<-function(data=coneta,lst.eta=keta,lst.cov=conv,save.path="./scatter.png",fancy="yes"){
-  library(ggpubr)
-  if(!is.null(fancy)){
-    names(data)[names(data)%in%lst.eta]<-gsub("ETA","",names(data)[names(data)%in%lst.eta])
-    lst.eta<-gsub("ETA","",lst.eta)
-    names(data)[names(data)%in%lst.eta]<-paste0("\U03B7",names(data)[names(data)%in%lst.eta])
-    lst.eta<-paste0("\U03B7",lst.eta)
-  }
-
-png(save.path,width=768,height=768,pointsize = 16)
- print(gpairs(x=data[,c(lst.eta,lst.cov)],
-               upper.pars = list(conditional = 'boxplot', scatter = 'loess'),
-               lower.pars = list(scatter = 'stats',conditional = "barcode"),
-               diag.pars = list(fontsize = 9, show.hist = TRUE, hist.color = "gray"),
-               stat.pars =list(fontsize = 11, signif =F, verbose =T, use.color = TRUE, missing = 'missing', just = 'centre'),
-               scatter.pars = list(pch = 20)))
- dev.off()}
 
 ####ETA DISTRIBUTION
 #' DISTRIBUTION OF ETA
@@ -690,6 +662,37 @@ p<-ggplot2::ggplot(ddat[is.na(ddat$amt),],aes_string(x=time,y=dv))+
 }
 
 
+#############################################
+#' CONTINUOUS SCATTER vs ETA
+#'
+#' Generate COVAR
+#' @param data Data frame, merged ETA and COVAR data
+#' @param lst.eta List of ETA names
+#' @param lst.cov List of covariate names. Add plot name to save.path
+#' @keywords lh_con_cov
+#' @export
+#' @examples p1<-lh_con_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
+
+lh_con_cov<-function(data=coneta,lst.eta=keta,lst.cov=conv,save.path="./scatter.png",fancy="yes"){
+  library(lattice)
+  if(!is.null(fancy)){
+    names(data)[names(data)%in%lst.eta]<-gsub("ETA","",names(data)[names(data)%in%lst.eta])
+    lst.eta<-gsub("ETA","",lst.eta)
+    names(data)[names(data)%in%lst.eta]<-paste0("\U03B7",names(data)[names(data)%in%lst.eta])
+    lst.eta<-paste0("\U03B7",lst.eta)
+  }
+
+  png(save.path,width=768,height=768,pointsize = 16)
+  print(gpairs(x=data[,c(lst.eta,lst.cov)],
+               upper.pars = list(conditional = 'boxplot', scatter = 'loess'),
+               lower.pars = list(scatter = 'stats',conditional = "barcode"),
+               diag.pars = list(fontsize = 9, show.hist = TRUE, hist.color = "gray"),
+               stat.pars =list(fontsize = 11, signif =F, verbose =T, use.color = TRUE, missing = 'missing', just = 'centre'),
+               scatter.pars = list(pch = 20)))
+  dev.off()}
+
+
+
 ##########################################################################################################################
 #' CONTINUOUS GP EXTERNAL FUNCTION FOR INTERNAL USE
 #'
@@ -710,8 +713,7 @@ gpairs<-function (x, upper.pars = list(scatter = "points", conditional = "barcod
                   stripplot.pars = NULL, barcode.pars = NULL, mosaic.pars = NULL,
                   axis.pars = NULL, diag.pars = NULL, whatis = FALSE)
 {
-  library(grid)
-  require(gpairs)
+
   if (!is.data.frame(x)) {
     if (is.matrix(x))
       x <- as.data.frame(x)
