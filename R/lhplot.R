@@ -675,6 +675,7 @@ p<-ggplot2::ggplot(ddat[is.na(ddat$amt),],aes_string(x=time,y=dv))+
 
 lh_con_cov<-function(data=coneta,lst.eta=keta,lst.cov=conv,save.path="./scatter.png",fancy="yes"){
   library(lattice)
+  library(grid)
   if(!is.null(fancy)){
     names(data)[names(data)%in%lst.eta]<-gsub("ETA","",names(data)[names(data)%in%lst.eta])
     lst.eta<-gsub("ETA","",lst.eta)
