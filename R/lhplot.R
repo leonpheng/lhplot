@@ -575,7 +575,6 @@ lh_indiv_plot<-function(data=dat1,id="usubjid",n.plots.page=9,time="time",dv="dv
   page<-1:ceiling(n/npepage)
   nb_pg2<-page*9
   nb_pg1<-c(1,nb_pg2[1:(length(nb_pg2)-1)]+1)
-  head(dat1)
 
   doc<-officer::read_docx()
   for(i in 1:length(nb_pg2)){
