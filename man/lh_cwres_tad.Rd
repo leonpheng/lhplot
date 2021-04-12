@@ -5,7 +5,7 @@
 \title{CWRES vs TAD}
 \usage{
 lh_cwres_tad(
-  data = dat1,
+  data,
   y = "CWRES",
   x = "TAD",
   type = "log",

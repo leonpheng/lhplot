@@ -1,3 +1,129 @@
+#' BOXPLOT MC SIMULATION
+#'
+#' Generate boxplot with targets and stats
+#' @param data data frame
+#' @keywords lhboxplot2
+#' @export
+#' @examples lhboxplot2(data=rall,
+#' @examples y="Cmaxss",
+#' @examples x="Label",
+#' @examples x.title="Group",
+#' @examples y.title="AUCss",
+#' @examples low.targ.line=rf$Cmaxsslow,
+#' @examples high.targ.line=rf$Cmaxsshi,
+#' @examples add.target="yes",
+#' @examples add.obs.point="yes",
+#' @examples add.stats="yes",
+#' @examples stat.label.space=c(0.1,0.2),jit=c(0.15,0)) +theme_bw()+ theme(axis.text.x #' @examples = element_text(angle = 45, hjust = 1))+scale_y_log10()
+
+lhboxplot2<-function(data,y,x,x.title,y.title,low.targ.line,high.targ.line,add.target="no",add.obs.point="no",add.stats="no",stat.label.space=c(0.1,0.2),jit=c(0.1,0.1))
+{
+  #Compute target attainment
+  library(ggplot2)
+  xti=x.title
+  yti=y.title
+  lowt=low.targ.line
+  hit=high.targ.line
+  obs=add.obs.point
+  prop=add.stats
+  space=stat.label.space
+  setdiff(c(x,y,lowt,hit),names(df))
+  s1<-data[,c(x,y)]
+  s1<-s1[order(s1[,x]),]
+  s1$hit<-hit
+  s1$lowt<-lowt
+
+  s1$y<-s1[,y]
+  s1$x<-s1[,x]
+  s1$f<-"dum"##s1[,facet]
+
+  s1$hi<-with(s1,ifelse(y>hit,1,0))
+  s1$wi<-with(s1,ifelse(y<=hit&y>=lowt,1,0))
+  s1$lo<-with(s1,ifelse(y<lowt,1,0))
+
+  nn<-addvar(s1,x,x,"length(x)","var","n")
+  #s1<-join(s1,nn)
+  str(s1)
+
+  targ<-addvar(s1,x,"hi","sum(x)","var","hi")
+  targ<-dplyr::left_join(targ,addvar(s1,x,"wi","sum(x)","var","wi"))
+  targ<-dplyr::left_join(targ,addvar(s1,x,"lo","sum(x)","var","lo"))
+  targ<-dplyr::left_join(targ,nn);
+  targ$hi<-with(targ,round(hi/n*100,1))
+  targ$wi<-with(targ,round(wi/n*100,1))
+  targ$lo<-with(targ,round(lo/n*100,1))
+  #Highlight greater % by inclreasing font size
+  for(i in 1:nrow(targ)){
+    targ$si1[i]<-ifelse(targ$wi[i]==max(targ[i,c("hi","wi","lo")]),3,2)
+    targ$si2[i]<-ifelse(targ$hi[i]==max(targ[i,c("hi","wi","lo")]),3,2)
+    targ$si3[i]<-ifelse(targ$lo[i]==max(targ[i,c("hi","wi","lo")]),3,2)
+  }
+
+  var<-y
+  targ$hi<-with(targ,paste0(hi,"%"))
+  targ$wi<-with(targ,paste0(wi,"%"))
+  targ$lo<-with(targ,paste0(lo,"%"))
+  targ$allt<-with(targ,paste(hi,wi,lo,sep="\n"))
+
+  head(s1)
+  s1[,c("f","lowt")]
+  lowtar<-nodup(s1,"f","add",c("lowt","hit","y"))
+
+  var<-y
+  coord<-addvar(s1,"f",var,"max(x)","add","max1")
+  targ$f<-"dum"
+  targ2<-dplyr::left_join(targ,coord)
+
+  targ2$ma1<-targ2$max1+(space[2]*targ2$max1)
+  targ2$me1<-targ2$max1+(space[1]*targ2$max1)
+  targ2$mi1<-targ2$max1
+  targ2$x<-targ2[,x]
+  #targ2$f<-targ2[,facet]
+
+  head(s1)
+
+  p0<-ggplot(s1,aes(x=x,y=y))
+  if(obs=="yes"){
+    p0<-p0+geom_jitter(width =jit[1], height =jit[2],col="gray",size=0.4)
+  }
+
+  p0<- p0+ geom_boxplot(outlier.shape ="", alpha = 0.5)+
+    xlab(xti)+ylab(yti)
+  # if(!is.null(facet)){
+  #   p0<-p0+facet_wrap(~f,scale="free")
+  # }
+  #if(obs=="yes"){
+  #    p0<-p0+geom_jitter(width =jit[1], height =jit[2],col="gray",size=0.4)
+  #  }
+
+
+
+  if(add.target=="yes"){
+
+    p0<-p0+ geom_hline(data=lowtar,aes(yintercept=lowt), linetype="dashed", color = "green4")+
+      geom_hline(data=lowtar,aes(yintercept=hit), linetype="dashed", color = "green4")
+
+  }
+
+  if(prop=="yes"){
+    if(hit==lowt){
+      p0<-p0+geom_text(data=targ2, aes(x=x, y=me1, label=lo), col='red', size=3)+
+        #geom_text(data=targ2, aes(x=x, y=me1, label=wi), col='blue', size=targ2$si1)+
+        geom_text(data=targ2, aes(x=x, y=ma1, label=hi), col='green4', size=2)
+    }else{p0<-p0+geom_text(data=targ2, aes(x=x, y=mi1, label=lo), col='red', size=2)+
+      geom_text(data=targ2, aes(x=x, y=me1, label=wi), col='green4', size=2)+
+      geom_text(data=targ2, aes(x=x, y=ma1, label=hi), col='red', size=2)
+    # +
+    # annotate("rect", xmin=hitar$x[1], xmax=hitar$x[2], ymin=lowtar$y[1], ymax=hitar$y[2], alpha=0.2, fill="red")
+    }
+  }
+  p0
+}
+
+
+
+
+
 #' DV vs X with STRAT
 #'
 #' Generate GOF1
@@ -121,7 +247,7 @@ p
 #' @examples p1<-lh_dv_pred(dat1,type="lin",IPREDN="IPRED")
 #' @examples p2<-lh_dv_pred(dat1,type="log",scale="auto")
 
-lh_dv_pred<-function(data=dat1,y="DV",
+lh_dv_pred<-function(data,y="DV",
                       x="PRED",type="log",scale=c(0.1,100),
                       IPREDN="Individual Predicted Concentration (ng/mL)",
                       PREDN="Population Predicted Concentration (ng/mL)",
@@ -174,7 +300,7 @@ lh_dv_pred<-function(data=dat1,y="DV",
 #' @examples p2<-lh_cwres_tad(dat1)
 
 
-lh_cwres_tad<-function(data=dat1,y="CWRES",
+lh_cwres_tad<-function(data,y="CWRES",
                      x="TAD",type="log",scale=c(0.1,100),
                      IPREDN="Individual Predicted Concentration (ng/mL)",
                      PREDN="Population Predicted Concentration (ng/mL)",
@@ -225,7 +351,7 @@ p
 #' @examples p2<-lh_cwres_time(dat1)
 
 
-lh_cwres_time<-function(data=dat1,y="CWRES",
+lh_cwres_time<-function(data,y="CWRES",
                        x="TIME",type="log",scale=c(0.1,100),
                        IPREDN="Individual Predicted Concentration (ng/mL)",
                        PREDN="Population Predicted Concentration (ng/mL)",
@@ -274,7 +400,7 @@ lh_cwres_time<-function(data=dat1,y="CWRES",
 #' @examples p1<-lh_cwres_pred(dat1)
 #' @examples p2<-lh_cwres_pred(dat1)
 
-lh_cwres_x<-function(data=dat1,y="CWRES",
+lh_cwres_x<-function(data,y="CWRES",
                         x="TIME",type="log",scale=c(0.1,100),
                         PREDN="Population Predicted Concentration (ng/mL)",
                         CWRESN="Conditional Weighted Residuals",
@@ -334,7 +460,7 @@ p
 #' @examples p1<-lh_cwres_pred(dat1)
 #' @examples p2<-lh_cwres_pred(dat1)
 
-lh_cwres_pred<-function(data=dat1,y="CWRES",
+lh_cwres_pred<-function(data,y="CWRES",
                         x="TIME",type="log",scale=c(0.1,100),
                         IPREDN="Individual Predicted Concentration (ng/mL)",
                         PREDN="Population Predicted Concentration (ng/mL)",
@@ -410,7 +536,7 @@ p
 #' @export
 #' @examples p1<-lh_cat_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
 #' @examples p2<-lh_gof()
-lh_cat_cov<-function(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL,fancy="yes"){
+lh_cat_cov<-function(data,lst.eta=c("ETA1"),lst.cov=c("SEX","RACE"),save.path=NULL,fancy="yes"){
   cat1 <- lhlong(data, lst.cov)
   names(cat1)[names(cat1) == "variable"] <- "Covariate"
   names(cat1)[names(cat1) == "value"] <- "Categorical"
@@ -478,7 +604,7 @@ lh_cat_cov<-function(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL,fancy="
 #' @export
 #' @examples p1<-lh_con_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
 
-lh_eta_dist<-function(data=r,lst.eta=c("ETACL","ETAVC","ETAV2","ETAQ"),ncol=3,nrow=2,fancy="yes"){
+lh_eta_dist<-function(data,lst.eta=c("ETACL","ETAVC","ETAV2","ETAQ"),ncol=3,nrow=2,fancy="yes"){
   if(!is.null(fancy)){
     xname<-gsub("ETA","",toupper(lst.eta))
  xname<-paste0("\U03B7",xname)
@@ -545,7 +671,7 @@ hist.cwres <- function(dat, ...) {
 #' @export
 #' @examples p1<-lh_con_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
 
-lh_cwres_dist<-function(data=r,cwres="cwres",file.name="dist_QQ_CWRES.png"){
+lh_cwres_dist<-function(data,cwres="cwres",file.name="dist_QQ_CWRES.png"){
 names(data)[names(data)==cwres]<-"cwres"
 
 png(file =file.name , width = 8, height = 6, units = 'in', res = 300)
@@ -566,7 +692,7 @@ dev.off()}
 #' @examples xtit="Time after first dose (h)",
 #' @examplesytit="Concentration (ng/mL)",output.name="Individiual.docx")
 
-lh_indiv_plot<-function(data=dat1,id="usubjid",n.plots.page=9,time="time",dv="dv",ipred="ipred",pred="pred",type="linear",xtit="Time after first dose (h)",ytit="Concentration (ng/mL)",output.name="./test.docx")
+lh_indiv_plot<-function(data,id="usubjid",n.plots.page=9,time="time",dv="dv",ipred="ipred",pred="pred",type="linear",xtit="Time after first dose (h)",ytit="Concentration (ng/mL)",output.name="./test.docx")
   {
   library(scales)
   library(ggplot2)
@@ -615,7 +741,7 @@ lh_indiv_plot<-function(data=dat1,id="usubjid",n.plots.page=9,time="time",dv="dv
 #' @examples xtit="Time after first dose (h)",
 #' @examplesytit="Concentration (ng/mL)",output.name="Individiual.docx")
 
-lh_explor_ind<-function(data=dat,dose="amt",id="id",n.plots.page=9,time="time",dv="dv",ipred=NULL,pred=NULL,type="linear",xtit="Time after first dose (h)",ytit="Concentration (ng/mL)",output.name="./test.docx")
+lh_explor_ind<-function(data,dose="amt",id="id",n.plots.page=9,time="time",dv="dv",ipred=NULL,pred=NULL,type="linear",xtit="Time after first dose (h)",ytit="Concentration (ng/mL)",output.name="./test.docx")
 {
   data[,dose][!is.na(data[,dose])&data[,dose]==0]<-NA
   data[,dv][!is.na(data[,dose])]<-NA
@@ -672,7 +798,7 @@ p<-ggplot2::ggplot(ddat[is.na(ddat$amt),],aes_string(x=time,y=dv))+
 #' @export
 #' @examples p1<-lh_con_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
 
-lh_con_cov<-function(data=coneta,lst.eta=keta,lst.cov=conv,save.path="./scatter.png",fancy="yes"){
+lh_con_cov<-function(data,lst.eta=c("eta1","eta2"),lst.cov=c("AGE","WT"),save.path="./scatter.png",fancy="yes"){
   library(lattice)
   library(grid)
   if(!is.null(fancy)){

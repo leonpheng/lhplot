@@ -5,9 +5,9 @@
 \title{CATEGORICAL BOXPLOT vs ETA}
 \usage{
 lh_cat_cov(
-  data = cateta,
-  lst.eta = keta,
-  lst.cov = cat,
+  data,
+  lst.eta = c("ETA1"),
+  lst.cov = c("SEX", "RACE"),
   save.path = NULL,
   fancy = "yes"
 )

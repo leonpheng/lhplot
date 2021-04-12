@@ -5,7 +5,7 @@
 \title{DV vs PRED}
 \usage{
 lh_dv_pred(
-  data = dat1,
+  data,
   y = "DV",
   x = "PRED",
   type = "log",

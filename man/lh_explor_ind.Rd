@@ -5,7 +5,7 @@
 \title{EXPLORATORY Individual plots}
 \usage{
 lh_explor_ind(
-  data = dat,
+  data,
   dose = "amt",
   id = "id",
   n.plots.page = 9,

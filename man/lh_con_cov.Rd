@@ -5,9 +5,9 @@
 \title{CONTINUOUS SCATTER vs ETA}
 \usage{
 lh_con_cov(
-  data = coneta,
-  lst.eta = keta,
-  lst.cov = conv,
+  data,
+  lst.eta = c("eta1", "eta2"),
+  lst.cov = c("AGE", "WT"),
   save.path = "./scatter.png",
   fancy = "yes"
 )

@@ -5,7 +5,7 @@
 \title{CWRES vs PRED}
 \usage{
 lh_cwres_pred(
-  data = dat1,
+  data,
   y = "CWRES",
   x = "TIME",
   type = "log",

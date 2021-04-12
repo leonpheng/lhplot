@@ -5,7 +5,7 @@
 \title{CWRES vs X with Strat}
 \usage{
 lh_cwres_x(
-  data = dat1,
+  data,
   y = "CWRES",
   x = "TIME",
   type = "log",

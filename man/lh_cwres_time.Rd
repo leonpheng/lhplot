@@ -5,7 +5,7 @@
 \title{CWRES vs RTIME or TIME}
 \usage{
 lh_cwres_time(
-  data = dat1,
+  data,
   y = "CWRES",
   x = "TIME",
   type = "log",

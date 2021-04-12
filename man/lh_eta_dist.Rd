@@ -5,7 +5,7 @@
 \title{DISTRIBUTION OF ETA}
 \usage{
 lh_eta_dist(
-  data = r,
+  data,
   lst.eta = c("ETACL", "ETAVC", "ETAV2", "ETAQ"),
   ncol = 3,
   nrow = 2,

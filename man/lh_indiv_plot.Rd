@@ -5,7 +5,7 @@
 \title{Individual plots}
 \usage{
 lh_indiv_plot(
-  data = dat1,
+  data,
   id = "usubjid",
   n.plots.page = 9,
   time = "time",
