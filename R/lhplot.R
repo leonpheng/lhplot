@@ -1,3 +1,77 @@
+
+#' GOF with Facet
+#'
+#' Generate GOF with stratification
+#' @param data data frame
+#' @keywords lh_dv_strat
+#' @export
+#' @examples lh_dv_strat(...)
+
+DVN ="Observed\n Concentrations (\U03BCg/mL)"
+IPREDN ="Individual Predictions (\U03BCg/mL)"
+PREDN = "Population Predicted (\U03BCg/mL)"
+
+lh_dv_strat<-function(data,x,y,id,xlab="Individual Predictions (\U03BCg/mL)",ylab="Observed\n Concentrations (\U03BCg/mL)",by="Age_Group"){
+  data$x<-data[,x]
+  data$y<-data[,y]
+  data$id<-data[,id]
+  data$strat<-data[,by]
+ggplot(data,aes(x,y,label=id))+
+  geom_blank(aes(x,y))  +
+  geom_abline(data= data.frame(slope = 1,intercept =0 ),
+              aes(slope=slope,intercept=intercept,alpha = "Identity"),
+              col = "blue",size=1.5,linetype=1, key_glyph = "path")+
+  geom_smooth(aes(linetype = "LOESS"),method = "loess",
+              method.args = list(span = 2/3,degree = 1, family = "symmetric"),
+              se=F,size=1.5)+
+  geom_point(pch=16, size=1.5, aes(col="Observed"),alpha=0.2) +
+  facet_grid(~strat,margins = "strat")+
+  scale_colour_manual(name=NULL,values="black",guide = guide_legend(order=1,label.hjust = 1))+
+  scale_alpha_manual(name=NULL,values = c(0.2), guide=guide_legend(order=2,label.hjust = 1) )+
+  scale_linetype_manual(name=NULL,values=2, guide=guide_legend(order=3,label.hjust = 1))+
+  labs(x=xlab, y=ylab)+
+  theme_bw(base_size = 13)+
+  theme(aspect.ratio = 1,legend.position="bottom",
+        legend.key.width = unit(0.5,"in"),
+        legend.key.height=unit(0.125,"in"))
+}
+
+#' CWRES with Facet
+#'
+#' Generate GOF with stratification
+#' @param data data frame
+#' @keywords lh_cwres_strat
+#' @export
+#' @examples lh_cwres_strat(...)
+lh_cwres_strat<-function(data,x,y,id,xlab="Population Predictions (\U03BCg/mL)",ylab="Conditional Weighted Residual",by="Age_Group"){
+  data$x<-data[,x]
+  data$y<-data[,y]
+  data$id<-data[,id]
+  data$strat<-data[,by]
+
+ggplot(data,aes(x,y,label=id))+
+  geom_hline(yintercept=0,size=1.5,color="blue",alpha=0.2) +
+  geom_hline(yintercept=4,linetype=2,color="gray") +
+  geom_hline(yintercept=-4,linetype=2,color="gray") +
+  geom_line(aes(x = 0, y = 0, alpha = "Identity"),size=1.5,color="blue")+
+  geom_smooth(aes(linetype = "LOESS"),method = "loess",
+              method.args = list(span = 2/3,degree = 1, family = "symmetric"),
+              se=F,size=1.5)+
+  geom_point(pch=16, size=1.5, aes(col="Observed"),alpha=0.2) +
+  facet_grid(~strat,margins = "strat") +
+  ylab(ylab)+ xlab(xlab)+
+  ylim(-6,6)+
+  scale_y_continuous(breaks=seq(-6,6,2),labels=c("-6","-4","-2","   0","2","4","6"))+
+  scale_colour_manual(name=NULL,values="black",guide = guide_legend(order=1,label.hjust = 1))+
+  scale_alpha_manual(name=NULL,values = c(0.2), guide=guide_legend(order=2,label.hjust = 1) )+
+  scale_linetype_manual(name=NULL,values=2, guide=guide_legend(order=3,label.hjust = 1))+
+  theme_bw(base_size = 13)+
+  theme(aspect.ratio = 1,legend.position="bottom",
+        legend.key.width = unit(0.5,"in"),
+        legend.key.height=unit(0.125,"in"))
+}
+
+
 #' BOXPLOT MC SIMULATION
 #'
 #' Generate boxplot with targets and stats
