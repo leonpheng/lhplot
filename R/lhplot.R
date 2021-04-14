@@ -7,10 +7,6 @@
 #' @export
 #' @examples lh_dv_strat(...)
 
-DVN ="Observed\n Concentrations (\U03BCg/mL)"
-IPREDN ="Individual Predictions (\U03BCg/mL)"
-PREDN = "Population Predicted (\U03BCg/mL)"
-
 lh_dv_strat<-function(data,x,y,id,xlab="Individual Predictions (\U03BCg/mL)",ylab="Observed\n Concentrations (\U03BCg/mL)",by="Age_Group"){
   data$x<-data[,x]
   data$y<-data[,y]
