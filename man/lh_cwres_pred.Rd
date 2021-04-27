@@ -7,7 +7,7 @@
 lh_cwres_pred(
   data,
   y = "CWRES",
-  x = "TIME",
+  x = "PRED",
   type = "log",
   scale = c(0.1, 100),
   IPREDN = "Individual Predicted Concentration (ng/mL)",
@@ -18,7 +18,8 @@ lh_cwres_pred(
   IVARN = "Time After First Dose (h)",
   CWRESN = "Conditional Weighted Residuals",
   col.obs = "#A6CEE3",
-  col.ident = "#1F78B4"
+  col.ident = "#1F78B4",
+  strat = NULL
 )
 }
 \arguments{

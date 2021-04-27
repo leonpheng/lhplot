@@ -7,7 +7,7 @@
 lh_cwres_x(
   data,
   y = "CWRES",
-  x = "TIME",
+  x = "PREDN",
   type = "log",
   scale = c(0.1, 100),
   PREDN = "Population Predicted Concentration (ng/mL)",
