@@ -15,7 +15,8 @@ lh_dv_x(
   col.obs = "#A6CEE3",
   col.ident = "#1F78B4",
   col.point = NULL,
-  shape.point = NULL
+  shape.point = NULL,
+  strat = NULL
 )
 }
 \arguments{

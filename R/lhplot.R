@@ -206,7 +206,7 @@ lhboxplot2<-function(data,y,x,x.title,y.title,low.targ.line,high.targ.line,add.t
 lh_dv_x<-function (data, y = "DV", x = "IPRED", type = "log",
                    scale = c(0.1, 100), IPREDN = "Individual Predicted Concentration (ng/mL)",
                    DVN = "Observed Concentration (ng/mL)", col.obs = "#A6CEE3",
-                   col.ident = "#1F78B4",col.point=NULL,shape.point=NULL)
+                   col.ident = "#1F78B4",col.point=NULL,shape.point=NULL,strat=NULL)
 {
   cw <- data#[, c(x, y, strat)]
   cw$x <- cw[,x];cw$y <- cw[,y]
