@@ -202,59 +202,32 @@ lhboxplot2<-function(data,y,x,x.title,y.title,low.targ.line,high.targ.line,add.t
 #' @export
 #' @examples p1<-lh_dv_ipred(dat1,type="lin",IPREDN="IPRED")
 #' @examples p2<-lh_dv_ipred(dat1,type="log")
-lh_dv_x<-function(data,y="DV",
-                      x="IPRED",type="log",scale=c(0.1,100),
-                      IPREDN="Individual Predicted Concentration (ng/mL)",
-                      DVN="Observed Concentration (ng/mL)",
-                      col.obs="#A6CEE3",col.ident="#1F78B4",strat=NULL
-){
-
-  if(!is.null(strat)){
-    cw<-data[,c(x,y,strat)]
-    names(cw)<-c("x","y","z")}else{
-      cw<-data[,c(x,y)]
-      names(cw)<-c("x","y")}
-  if("auto"%in%scale){
+lh_dv_x<-function (data, y = "DV", x = "IPRED", type = "log",
+                   scale = c(0.1, 100), IPREDN = "Individual Predicted Concentration (ng/mL)",
+                   DVN = "Observed Concentration (ng/mL)", col.obs = "#A6CEE3",
+                   col.ident = "#1F78B4",col.point=NULL,shape.point=NULL)
+{
+  cw <- data#[, c(x, y, strat)]
+  cw$x <- cw[,x];cw$y <- cw[,y]
+  if("auto" %in% scale) {
     limx <- range(cw$x, cw$y)
-    if(min(limx)==0){
-      limx1 <-c(0.01,10^ceiling(log10(max(limx))))}else{
-        limx1 <-c(10^floor(log10(min(limx))),10^ceiling(log10(max(limx))))
-      }}else{
-        limx <-scale
-        limx1 <-c(10^floor(log10(scale[1])),10^ceiling(log10(scale[2])))
-      }
-
-  cols <- c("Observed"=col.obs)
-  cols1 <- c("Identity"=col.ident)
-  if(!is.null(strat)){
-    p<-ggplot2::ggplot(cw,aes(x=x,y=y))+
-      geom_point(aes(col=factor(z)))+
-      xlab(IPREDN)+ylab(DVN)+
-      geom_abline(slope=1,size=1,col="blue")+
-      geom_line(aes(x=0,y=0,linetype="Identity"))+
-      geom_smooth(method="loess", method.args=list(span=2/3, degree=1, family="symmetric"), se=F,aes(linetype="LOESS"))+
-      #scale_colour_manual(name="",values=cols) +
-      scale_linetype_discrete(name = "")+
-      guides(col=guide_legend(title=strat))+
-      theme_bw()
-  }else{
-  p<-ggplot2::ggplot(cw,aes(x=x,y=y))+
-    geom_point(aes(col="Observed"))+
-    xlab(IPREDN)+ylab(DVN)+
-    geom_abline(slope=1,size=1,col="blue")+
-    geom_line(aes(x=0,y=0,linetype="Identity"))+
-    geom_smooth(method="loess", method.args=list(span=2/3, degree=1, family="symmetric"), se=F,aes(linetype="LOESS"))+
-    scale_colour_manual(name="",values=cols) +
-    scale_linetype_discrete(name = "")+
-    theme_bw()}
-
-  if(type=="lin"){
-    p=p+scale_x_continuous(limits=limx)+scale_y_continuous(limits=limx)
-  }else{
-    p=p+scale_x_log10(limits=limx1)+scale_y_log10(limits=limx1)
+    if (min(limx) == 0) {
+      limx1 <- c(0.01, 10^ceiling(log10(max(limx))))
+    }else {
+      limx1 <- c(10^floor(log10(min(limx))), 10^ceiling(log10(max(limx))))
+    }
+  } else {
+    limx <- scale
+    limx1 <- c(10^floor(log10(scale[1])), 10^ceiling(log10(scale[2])))
   }
-  p
+  cols <- c(Observed = col.obs)
+  cols1 <- c(Identity = col.ident)
+  p <- ggplot(cw, aes_string(x = x, y = y))
+  p<-p+geom_point(aes_string(col=col.point,shape=shape.point))+
+    xlab(IPREDN) + ylab(DVN) + geom_abline(slope = 1, size = 1, col = "blue") + geom_line(aes(x = 0, y = 0, linetype = "Identity")) + geom_smooth(method = "loess",method.args = list(span = 2/3, degree = 1, family = "symmetric"),se = F, aes(linetype = "LOESS")) + scale_linetype_discrete(name = "") +
+    guides(col = guide_legend(title = strat)) + theme_bw()
 }
+
 
 
 #' DV vs IPRED

@@ -14,7 +14,8 @@ lh_dv_x(
   DVN = "Observed Concentration (ng/mL)",
   col.obs = "#A6CEE3",
   col.ident = "#1F78B4",
-  strat = NULL
+  col.point = NULL,
+  shape.point = NULL
 )
 }
 \arguments{
