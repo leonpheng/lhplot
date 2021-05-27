@@ -202,6 +202,7 @@ lhboxplot2<-function(data,y,x,x.title,y.title,low.targ.line,high.targ.line,add.t
 #' @export
 #' @examples p1<-lh_dv_ipred(dat1,type="lin",IPREDN="IPRED")
 #' @examples p2<-lh_dv_ipred(dat1,type="log")
+
 lh_dv_x<-function (data, y = "DV", x = "IPRED", type = "log",
                    scale = c(0.1, 100), IPREDN = "Individual Predicted Concentration (ng/mL)",
                    DVN = "Observed Concentration (ng/mL)", col.obs = "#A6CEE3",
