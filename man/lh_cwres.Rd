@@ -14,7 +14,8 @@ lh_cwres(
   ytit = "Conditional Weighted Residuals",
   sortby = NULL,
   col.obs = "#A6CEE3",
-  col.ident = "#1F78B4"
+  col.ident = "#1F78B4",
+  brew.col = NULL
 )
 }
 \arguments{

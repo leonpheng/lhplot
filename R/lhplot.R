@@ -11,7 +11,7 @@ lh_cwres<-function(data,y="CWRES",
                    xtit="Individual Predicted Concentration (ng/mL)",
                    ytit="Conditional Weighted Residuals",
                    sortby=NULL,
-                   col.obs="#A6CEE3",col.ident="#1F78B4"
+                   col.obs="#A6CEE3",col.ident="#1F78B4",brew.col=NULL
 ){
 
   r<-data[,c(x,y,sortby)]
@@ -29,7 +29,9 @@ lh_cwres<-function(data,y="CWRES",
 
   cols <- c("Observed"=col.obs)
   cols1 <- c("Identity"=col.ident)
-  cols2<-c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D")
+  if(is.null(brew.col)){
+  cols2<-RColorBrewer::display.brewer.pal(n = 8, name = 'Dark2')}else{
+  cols2<-brew.col}
 
   if(is.null(sortby)){
     p<-ggplot2::ggplot(r,aes(x=x,y=y))+
@@ -72,7 +74,7 @@ lh_dv<-function(data,y="DV",
                 xtit="Individual Predicted Concentration (ng/mL)",
                 ytit="Observed Concentration (ng/mL)",
                 sortby=NULL,
-                col.obs="#A6CEE3",col.ident="#1F78B4"
+                col.obs="#A6CEE3",col.ident="#1F78B4",brew.col=NULL
 ){
 
   r<-data[,c(x,y,sortby)]
@@ -90,7 +92,10 @@ lh_dv<-function(data,y="DV",
 
   cols <- c("Observed"=col.obs)
   cols1 <- c("Identity"=col.ident)
-  cols2<-c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D")
+
+  if(is.null(brew.col)){
+    cols2<-RColorBrewer::display.brewer.pal(n = 8, name = 'Dark2')}else{
+      cols2<-brew.col}
 
   if(is.null(sortby)){
     p<-ggplot2::ggplot(r,aes(x=x,y=y))+
