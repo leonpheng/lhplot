@@ -1,3 +1,127 @@
+#' Plot cwres vs x
+#'
+#' Generate plot with sort color of observe
+#' @param data data frame
+#' @keywords lh_cwres
+#' @export
+#' @examples lh_cwres(...)
+#'
+lh_cwres<-function(data,y="CWRES",
+                   x="TAD",type="log",scale=c(0.1,100),
+                   xtit="Individual Predicted Concentration (ng/mL)",
+                   ytit="Conditional Weighted Residuals",
+                   sortby=NULL,
+                   col.obs="#A6CEE3",col.ident="#1F78B4"
+){
+
+  r<-data[,c(x,y,sortby)]
+  names(r)[1:ncol(r)]<-c("x","y","colby")[1:ncol(r)]
+
+  if("auto"%in%scale){
+    limx <- range(r$x, r$y)
+    if(min(limx)==0){
+      limx1 <-c(0.01,10^ceiling(log10(max(limx))))}else{
+        limx1 <-c(10^floor(log10(min(limx))),10^ceiling(log10(max(limx))))
+      }}else{
+        limx <-scale
+        limx1 <-c(10^floor(log10(scale[1])),10^ceiling(log10(scale[2])))
+      }
+
+  cols <- c("Observed"=col.obs)
+  cols1 <- c("Identity"=col.ident)
+  cols2<-c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D")
+
+  if(is.null(sortby)){
+    p<-ggplot2::ggplot(r,aes(x=x,y=y))+
+      geom_point(aes(col="Observed"))+
+      xlab(xtit)+ylab(ytit)+
+      geom_hline(aes(yintercept=0),linetype="solid") +
+      geom_hline(yintercept=c(-4,4,-6,6),linetype = "dashed",col="grey")+
+      geom_smooth(method="loess", method.args=list(span=2/3, degree=1, family="symmetric"), se=F,linetype="dashed")+
+      scale_x_continuous(labels = function(x) format(x, scientific =F))+
+      scale_y_continuous(limits=c(-8,8),breaks=seq(-8,8,2))+
+      scale_colour_manual(name="",values=cols) +
+      scale_linetype_discrete(name = "")+
+      theme_bw()}else{
+        p<-ggplot2::ggplot(r,aes(x=x,y=y))+
+          geom_point(aes(col=colby),alpha=0.3)+
+          xlab(xtit)+ylab(ytit)+
+          geom_hline(aes(yintercept=0),linetype="solid") +
+          geom_hline(yintercept=c(-4,4,-6,6),linetype = "dashed",col="grey")+
+          geom_smooth(method="loess", method.args=list(span=2/3, degree=1, family="symmetric"), se=F,linetype="dashed")+
+          scale_x_continuous(labels = function(x) format(x, scientific =F))+
+          scale_y_continuous(limits=c(-8,8),breaks=seq(-8,8,2))+
+          scale_colour_manual(name=sortby,values=cols2) +
+          scale_linetype_discrete(name = "")+
+          theme_bw()
+      }
+  p
+}
+
+
+#' Plot DV vs predicted concentration
+#'
+#' Generate plot with sort color of observe
+#' @param data data frame
+#' @keywords lh_dv
+#' @export
+#' @examples lh_dv(...)
+#'
+lh_dv<-function(data,y="DV",
+                x="IPRED",type="log",scale="auto",
+                xtit="Individual Predicted Concentration (ng/mL)",
+                ytit="Observed Concentration (ng/mL)",
+                sortby=NULL,
+                col.obs="#A6CEE3",col.ident="#1F78B4"
+){
+
+  r<-data[,c(x,y,sortby)]
+  names(r)[1:ncol(r)]<-c("x","y","colby")[1:ncol(r)]
+
+  if("auto"%in%scale){
+    limx <- range(r$x, r$y)
+    if(min(limx)==0){
+      limx1 <-c(0.01,10^ceiling(log10(max(limx))))}else{
+        limx1 <-c(10^floor(log10(min(limx))),10^ceiling(log10(max(limx))))
+      }}else{
+        limx <-scale
+        limx1 <-c(10^floor(log10(scale[1])),10^ceiling(log10(scale[2])))
+      }
+
+  cols <- c("Observed"=col.obs)
+  cols1 <- c("Identity"=col.ident)
+  cols2<-c("#1B9E77", "#D95F02", "#7570B3", "#E7298A", "#66A61E", "#E6AB02", "#A6761D")
+
+  if(is.null(sortby)){
+    p<-ggplot2::ggplot(r,aes(x=x,y=y))+
+      geom_point(aes(col="Observed"))+
+      xlab(xtit)+ylab(ytit)+
+      geom_abline(slope=1,size=1,col="blue")+
+      geom_line(aes(x=0,y=0,linetype="Identity"))+
+      geom_smooth(method="loess", method.args=list(span=2/3, degree=1, family="symmetric"), se=F,aes(linetype="LOESS"))+
+      scale_colour_manual(name="",values=cols) +
+      scale_linetype_discrete(name = "")+
+      theme_bw()}else{
+        p<-ggplot2::ggplot(r,aes(x=x,y=y))+
+          geom_point(aes(col=colby),alpha=0.3)+
+          xlab(xtit)+ylab(ytit)+
+          geom_abline(slope=1,size=1,col="blue")+
+          geom_line(aes(x=0,y=0,linetype="Identity"))+
+          geom_smooth(method="loess", method.args=list(span=2/3, degree=1, family="symmetric"), se=F,aes(linetype="LOESS"))+
+          scale_colour_manual(name=sortby,values=cols2) +
+          scale_linetype_discrete(name = "")+
+          theme_bw()
+      }
+  if(type=="lin"){
+    p=p+scale_x_continuous(limits=limx)+scale_y_continuous(limits=limx)
+  }else{
+    p=p+scale_x_log10(limits=limx1)+scale_y_log10(limits=limx1)
+  }
+  p
+}
+
+
+
 
 #' GOF with Facet
 #'
