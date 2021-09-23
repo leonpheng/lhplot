@@ -30,7 +30,7 @@ lh_cwres<-function(data,y="CWRES",
   cols <- c("Observed"=col.obs)
   cols1 <- c("Identity"=col.ident)
   if(is.null(brew.col)){
-  cols2<-RColorBrewer::display.brewer.pal(n = 8, name = 'Dark2')}else{
+  cols2<-RColorBrewer::brewer.pal(n = 8, name = 'Dark2')}else{
   cols2<-brew.col}
 
   if(is.null(sortby)){
@@ -94,7 +94,7 @@ lh_dv<-function(data,y="DV",
   cols1 <- c("Identity"=col.ident)
 
   if(is.null(brew.col)){
-    cols2<-RColorBrewer::display.brewer.pal(n = 8, name = 'Dark2')}else{
+    cols2<-RColorBrewer::brewer.pal(n = 8, name = 'Dark2')}else{
       cols2<-brew.col}
 
   if(is.null(sortby)){
