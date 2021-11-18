@@ -36,4 +36,5 @@ tidyvpc::stratify(~DOSE) \%>\%
 binning(bin =NTIMEN)\%>\%
 p<-vpcstats() + other ggplot functions such as facet_wrap/grid, etc.
 vpc_cat(...)
+
 }

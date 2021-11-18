@@ -13,76 +13,70 @@
 #' @examples binning(bin =NTIMEN)%>%
 #' @examples p<-vpcstats() + other ggplot functions such as facet_wrap/grid, etc.
 #'@examples vpc_cat(...)
-vpc_cat<-function(sim.data=vpc$stats,obs.data=vpc$obs,obs.var=c("x","y"),box.width=0.1,bin.cat="xbin",y.sim=c("y","lo","md","hi","qname"),xtit="",ytit="Concentration (ng/mL)",log.y=NULL,x.lab=c("Pre-dose","1-h Post-dose"))
+#'
+vpc_cat<-function (sim.data = vpc$stats, obs.data = vpc$obs, obs.var = c("x", "y"),
+                   box.width = 0.1, bin.cat = "xbin", y.sim = c("y","lo", "md", "hi", "qname"), xtit = "",
+                   ytit = "Concentration (ng/mL)",
+ log.y = NULL, x.lab = c("Pre-dose","1-h Post-dose"))
 {
-
-  if(!is.null(obs.data)){
-    z0<-as.data.frame(obs.data)
-    z0$x<-z0[,obs.var[1]]
-    z0$y<-z0[,obs.var[2]]}
-
-  z<-as.data.frame(sim.data)
-  z$xbin<-z[,bin.cat]
+  if (!is.null(obs.data)) {
+    z0 <- as.data.frame(obs.data)
+    z0$x <- z0[, obs.var[1]]
+    z0$y <- z0[, obs.var[2]]
+  }
+  z <- as.data.frame(sim.data)
+  z$xbin <- z[, bin.cat]
   head(z)
-  z$y<-z[,y.sim[1]]
-  z$lo<-z[,y.sim[2]]
-  z$hi<-z[,y.sim[4]]
-  z$md<-z[,y.sim[3]]
-  z$qname<-z[,y.sim[5]]
-  z$obs.name<-"Obs"
+  z$y <- z[, y.sim[1]]
+  z$lo <- z[, y.sim[2]]
+  z$hi <- z[, y.sim[4]]
+  z$md <- z[, y.sim[3]]
+  z$qname <- z[, y.sim[5]]
+  z$obs.name <- "Obs"
+  z2 = NULL
+  l = box.width
+  fac<-min(z$xbin[z$xbin!=0])
 
-  z2=NULL
-  l=box.width
-  for(i in unique(z$xbin)){
-    z1<-z[z$xbin==i,]
-    if(i==0){
-      z1$x1<-(-l)
-      z1$x2<-l
-    }else{z1$x1<-z1$xbin-z1$xbin*(l)
-    z1$x2<-z1$xbin+z1$xbin*(l)}
-    z2<-rbind(z2,z1)}
+  for (i in unique(z$xbin)) {
+    z1 <- z[z$xbin == i, ]
+
+    if (i == 0) {
+      z1$x1 <- fac*(-l)
+      z1$x2 <- fac*(l)
+    }
+    else {
+      z1$x1 <- z1$xbin - fac * (l)
+      z1$x2 <- z1$xbin + fac * (l)
+    }
+    z2 <- rbind(z2, z1)
+  }
   head(z2)
   str(z2)
-  brk<-unique(z2$xbin)
-  lim<-c(range(brk)[1]-1,range(brk)[2]+1)
-
-  p<-ggplot(z2,aes(x=xbin))+
-    #facet_wrap(~DOSE) +
-    geom_rect(mapping=aes(xmin=x1, xmax=x2, ymin=lo, ymax=hi,fill=qname, col=qname,group=qname), alpha=0.3, col=NA) +
-    #geom_ribbon(aes(ymin=lo, ymax=hi, fill=qname, col=qname,
-    #group=qname), alpha=0.1, col=NA) +
-    labs(x=xtit, y=ytit)
-  if(!is.null(obs.data)){
-    p<-p+geom_point(data=z0,aes(x=x,y=y),alpha=0.1,col="grey")}
-
-  p<-p+geom_point(aes(y=md, col=qname,group=qname)) +
-    geom_point(aes(y=y),col="black",shape=21, size=2) +
-    scale_colour_manual(
-      name="Percentiles/Median",
-      breaks=c("q0.05", "q0.5", "q0.95"),
-      values=c("red", "blue", "red"),
-      labels=c("5%", "50%", "95%")) +
-    scale_x_continuous(breaks=brk,limits=lim,labels=x.lab)+
-    scale_fill_manual(
-      name="Percentiles/Median",
-      breaks=c("q0.05", "q0.5", "q0.95"),
-      values=c("red", "blue", "red"),
-      labels=c("5%", "50%", "95%")) +
-    #scale_linetype_manual(
-    #  name="Observed Percentiles\n(black lines)",
-    #  breaks=c("q0.05", "q0.5", "q0.95"),
-    #  values=c("dotted", "solid", "dashed"),
-    #  labels=c("5%", "50%", "95%")) +
-    guides(
-      fill=guide_legend(order=2),
-      colour=guide_legend(order=2),
-      linetype=guide_legend(order=1)) +
-    theme(
-      legend.position="top",
-      legend.key.width=grid::unit(1, "cm"))+
-    theme_bw()
-  p}
-
+  brk <- unique(z2$xbin)
+  lim <- c(range(brk)[1] - 1, range(brk)[2] + 1)
+  p <- ggplot(z2, aes(x = xbin)) + geom_rect(mapping = aes(xmin = x1,
+                                                           xmax = x2, ymin = lo, ymax = hi, fill = qname, col = qname,
+                                                           group = qname), alpha = 0.1, col = NA) + labs(x = xtit,
+                                                                                                         y = ytit)
+  if (!is.null(obs.data)) {
+    p <- p + geom_point(data = z0, aes(x = x, y = y),
+                        col = "grey",alpha=0.3,size=1,position = position_jitter(w = 0.1, h = 0))
+  }
+  p <- p + geom_point(aes(y = md, col = qname, group = qname)) +
+    geom_point(aes(y = y,shape="Observed Percentile(5%,50%,95%)"),col="green",
+               size =2,alpha=0.4) + scale_colour_manual(name = "Percentiles/Median",
+                                                        breaks = c("q0.05", "q0.5", "q0.95"),
+                                                        values = c("red", "blue", "red"), labels = c("5%",
+                                                                                                     "50%", "95%")) + scale_x_continuous(breaks = brk,
+                                                                                                                                         limits = lim, labels = x.lab) + scale_fill_manual(name = "Percentiles/Median",
+                                                                                                                                                                                           breaks = c("q0.05", "q0.5", "q0.95"),
+                                                                                                                                                                                           values = c("red", "blue", "red"), labels = c("5%",
+                                                                                                                                                                                                                                        "50%", "95%")) + guides(fill = guide_legend(order = 2),
+                                                                                                                                                                                                                                                                colour = guide_legend(order = 2), linetype = guide_legend(order = 1)) +
+    theme(legend.position = "top", legend.key.width = grid::unit(1,
+                                                                 "cm")) + theme_bw()
+  p
+}
 
 
 #' Plot cwres vs x
