@@ -1,3 +1,69 @@
+####BOXPLOT
+#' CATEGORICAL vs CONTINUOUS BOXPLOT
+#'
+#' Generate COVAR CAT vs CONT
+#' @param data Data frame, merged ETA and COVAR data
+#' @param lst.eta List of continuous cov
+#' @param lst.cov Cat cov names.Plots are generated in loop if more than one covariate.
+#' @param save.path required if more than 1 Cat cov.
+#' @keywords lh_catcon_cov
+#' @export
+#' @examples p1<-lh_cat_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
+#' @examples p2<-lh_gof()
+lh_catcon_cov<-function (data, lst.eta = c("contcov"),con.cov.group="demo", lst.cov = c("SEX",
+                                                                                        "RACE"), save.path = NULL, fancy =NULL,ytit="Continuous Covariate",xtit="")
+{
+  cat1 <- lhlong(data, lst.cov)
+  names(cat1)[names(cat1) == "variable"] <- "Covariate"
+  names(cat1)[names(cat1) == "value"] <- "Categorical"
+  cat1 <- chclass(cat1, c("Covariate", "Categorical"),
+                  "char")
+  cat1 <- addvar(cat1, c("Covariate", "Categorical"),
+                 lst.eta[1], "length(x)", "yes", "count")
+  cat1$Cat1 <- paste0(cat1$Categorical, "\n (n=", cat1$count,
+                      ")")
+  cat1 <- lhlong(cat1, lst.eta)
+  cat1 <- chclass(cat1, c("Covariate", "Categorical",
+                          "variable"), "char")
+  unique(cat1$Categorical)
+  head(cat1)
+  cat1$variable <- factor(cat1$variable, levels = lst.eta)
+  catnum <- addvar(nodup(cat1, c("Covariate", "Categorical"),
+                         "var"), "Covariate", "Categorical",
+                   "length(x)", "no", "catnumber")
+  for (i in lst.cov[lst.cov %in% catnum$Covariate[catnum$catnumber >
+                                                  0]]) {
+    dcat <- cat1[cat1$Covariate %in% i, ]
+    ord <- sort(unique(data[, i]))
+    label <- nodup(dcat, c("Categorical", "Cat1"),"var")
+    label$Categorical <- factor(label$Categorical, levels = ord)
+    lablel <- label$Cat1[order(label$Categorical)]
+    dcat$Cat1 <- factor(dcat$Cat1, levels = lablel)
+    head(dcat)
+    if (!is.null(fancy)) {
+      dcat$variable1 <- gsub("ETA", "", dcat$variable)
+      dcat$variable1 <- paste0("??", dcat$variable1)
+      dcat <- lhfactor(dcat, "variable", "variable1")
+    } else {
+      dcat$variable1 <- dcat$variable
+    }
+    p <- ggplot2::ggplot(dcat, aes(x = Cat1, y = value)) +
+      geom_boxplot(outlier.shape = NA) +
+      geom_jitter(position = position_jitter(0.1),col = "grey") +
+      #geom_hline(yintercept = 0,linetype = 2, color = "red", size = 1) +
+      ylab(ytit) +
+      xlab(xtit) + facet_wrap(~variable1, scale = "free", ncol = 2) +
+      theme_bw() + theme(axis.text.x = element_text(angle = 45, hjust = 0.1, vjust = 0.4, size = 10))
+    if (!is.null(save.path)) {
+      nm <- paste0(save.path,con.cov.group,"vs",i, "_boxplot.png")
+      ggsave(nm, p, width = 12, height = 12)
+    }else {
+      p
+    }
+  }
+  p
+}
+
 #' VPC with Categorical X
 #'
 #' Generate categorical VPC plot

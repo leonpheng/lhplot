@@ -3,6 +3,7 @@
 S3method(hist,cwres)
 export(gpairs)
 export(lh_cat_cov)
+export(lh_catcon_cov)
 export(lh_con_cov)
 export(lh_cwres)
 export(lh_cwres_dist)
