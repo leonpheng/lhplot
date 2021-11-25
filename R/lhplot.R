@@ -96,7 +96,6 @@ vpc_cat<-function (sim.data = vpc$stats, obs.data = vpc$obs,
   head(z)
   z$xbin <- z[, bin.cat]
   z<-reflag(z,"xbin",sort(unique(z$xbin)),seq(length(unique(z$xbin))))
-  z0<-reflag(z0,"bin",sort(unique(z0$bin)),seq(length(unique(z0$bin))),"x")
 
   head(z)
   z$y <- z[, y.sim[1]]
@@ -131,9 +130,11 @@ vpc_cat<-function (sim.data = vpc$stats, obs.data = vpc$obs,
                                                            xmax = x2, ymin = lo, ymax = hi, fill = qname, col = qname,
                                                            group = qname), alpha = 0.1, col = NA) + labs(x = xtit,
                                                                                                          y = ytit)
-  str(z0)
-  z0$x<-as.numeric(z0$x)
+
   if (!is.null(obs.data)) {
+    str(z0)
+    z0<-reflag(z0,"bin",sort(unique(z0$bin)),seq(length(unique(z0$bin))),"x")
+    z0$x<-as.numeric(z0$x)
     p <- p + geom_point(data = z0, aes(x =x, y = y),
                         col = "grey",alpha=0.3,size=1,position = position_jitter(w = 0.1, h = 0))
   }
