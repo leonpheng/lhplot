@@ -80,10 +80,12 @@ lh_catcon_cov<-function (data, lst.eta = c("contcov"),con.cov.group="demo", lst.
 #' @examples p<-vpcstats() + other ggplot functions such as facet_wrap/grid, etc.
 #'@examples vpc_cat(...)
 #'
-vpc_cat<-function (sim.data = vpc$stats, obs.data = vpc$obs, obs.var = c("x", "y"),
+
+vpc_cat<-function (sim.data = vpc$stats, obs.data = vpc$obs,
+                   obs.var = c("x","y"),
                    box.width = 0.1, bin.cat = "xbin", y.sim = c("y","lo", "md", "hi", "qname"), xtit = "",
-                   ytit = "Concentration (ng/mL)",
- log.y = NULL, x.lab = c("Pre-dose","1-h Post-dose"))
+                   ytit = "Concentration (ng/mL)", log.y = NULL, x.lab = c("Pre-dose",
+                                                                           "1-h Post-dose"))
 {
   if (!is.null(obs.data)) {
     z0 <- as.data.frame(obs.data)
@@ -91,7 +93,11 @@ vpc_cat<-function (sim.data = vpc$stats, obs.data = vpc$obs, obs.var = c("x", "y
     z0$y <- z0[, obs.var[2]]
   }
   z <- as.data.frame(sim.data)
+  head(z)
   z$xbin <- z[, bin.cat]
+  z<-reflag(z,"xbin",sort(unique(z$xbin)),seq(length(unique(z$xbin))))
+  z0<-reflag(z0,"bin",sort(unique(z0$bin)),seq(length(unique(z0$bin))),"x")
+
   head(z)
   z$y <- z[, y.sim[1]]
   z$lo <- z[, y.sim[2]]
@@ -101,6 +107,8 @@ vpc_cat<-function (sim.data = vpc$stats, obs.data = vpc$obs, obs.var = c("x", "y
   z$obs.name <- "Obs"
   z2 = NULL
   l = box.width
+  z$xbin<-as.numeric(z$xbin)
+
   fac<-min(z$xbin[z$xbin!=0])
 
   for (i in unique(z$xbin)) {
@@ -109,8 +117,7 @@ vpc_cat<-function (sim.data = vpc$stats, obs.data = vpc$obs, obs.var = c("x", "y
     if (i == 0) {
       z1$x1 <- fac*(-l)
       z1$x2 <- fac*(l)
-    }
-    else {
+    } else {
       z1$x1 <- z1$xbin - fac * (l)
       z1$x2 <- z1$xbin + fac * (l)
     }
@@ -124,8 +131,10 @@ vpc_cat<-function (sim.data = vpc$stats, obs.data = vpc$obs, obs.var = c("x", "y
                                                            xmax = x2, ymin = lo, ymax = hi, fill = qname, col = qname,
                                                            group = qname), alpha = 0.1, col = NA) + labs(x = xtit,
                                                                                                          y = ytit)
+  str(z0)
+  z0$x<-as.numeric(z0$x)
   if (!is.null(obs.data)) {
-    p <- p + geom_point(data = z0, aes(x = x, y = y),
+    p <- p + geom_point(data = z0, aes(x =x, y = y),
                         col = "grey",alpha=0.3,size=1,position = position_jitter(w = 0.1, h = 0))
   }
   p <- p + geom_point(aes(y = md, col = qname, group = qname)) +
@@ -133,17 +142,12 @@ vpc_cat<-function (sim.data = vpc$stats, obs.data = vpc$obs, obs.var = c("x", "y
                size =2,alpha=0.4) + scale_colour_manual(name = "Percentiles/Median",
                                                         breaks = c("q0.05", "q0.5", "q0.95"),
                                                         values = c("red", "blue", "red"), labels = c("5%",
-                                                                                                     "50%", "95%")) + scale_x_continuous(breaks = brk,
-                                                                                                                                         limits = lim, labels = x.lab) + scale_fill_manual(name = "Percentiles/Median",
-                                                                                                                                                                                           breaks = c("q0.05", "q0.5", "q0.95"),
-                                                                                                                                                                                           values = c("red", "blue", "red"), labels = c("5%",
-                                                                                                                                                                                                                                        "50%", "95%")) + guides(fill = guide_legend(order = 2),
-                                                                                                                                                                                                                                                                colour = guide_legend(order = 2), linetype = guide_legend(order = 1)) +
+                                                                                                     "50%", "95%")) + scale_x_continuous(breaks = brk,limits = lim, labels = x.lab) +
+    scale_fill_manual(name = "Percentiles/Median", breaks = c("q0.05", "q0.5", "q0.95"), values = c("red", "blue", "red"), labels = c("5%","50%", "95%")) + guides(fill = guide_legend(order = 2),                                    colour = guide_legend(order = 2), linetype = guide_legend(order = 1)) +
     theme(legend.position = "top", legend.key.width = grid::unit(1,
                                                                  "cm")) + theme_bw()
   p
 }
-
 
 #' Plot cwres vs x
 #'
