@@ -5,8 +5,8 @@
 \title{DISTRIBUTION OF ETA}
 \usage{
 lh_eta_dist(
-  data,
-  lst.eta = c("ETACL", "ETAVC", "ETAV2", "ETAQ"),
+  data = eta1,
+  lst.eta = c("Ka", "F", "Vc"),
   ncol = 3,
   nrow = 2,
   fancy = "yes"

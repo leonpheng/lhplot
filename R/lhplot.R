@@ -970,27 +970,34 @@ lh_cat_cov<-function(data,lst.eta=c("ETA1"),lst.cov=c("SEX","RACE"),save.path=NU
 #' @export
 #' @examples p1<-lh_con_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
 
-lh_eta_dist<-function(data,lst.eta=c("ETACL","ETAVC","ETAV2","ETAQ"),ncol=3,nrow=2,fancy="yes"){
-  if(!is.null(fancy)){
-    xname<-gsub("ETA","",toupper(lst.eta))
- xname<-paste0("\U03B7",xname)
-  }else{xname<-lst.eta}
+lh_eta_dist<-function (data=eta1, lst.eta =c("Ka","F","Vc"), ncol = 3, nrow = 2, fancy = "yes")
+{
+  if (!is.null(fancy)) {
+    xname <- gsub("ETA", "", toupper(lst.eta))
+    xname <- paste0("\U03B7", xname)
+  }  else {
+    xname <- lst.eta
+  }
   head(data)
-myplots <- list()
-for(i in 1:length(lst.eta)){
-p1<-ggplot2::ggplot(data,aes_string(x=lst.eta[i]))+geom_density(fill="royalblue3",col=NA,alpha=0.3,bin=60)+
-  geom_histogram(aes_string(x=lst.eta[i],y="..density.."),fill=NA,col="black")+
-  xlab(xname[i])+ylab("Density")+
-  geom_vline(aes(xintercept=0,col="Zero",linetype = "Zero"),size=1.2)+
-  geom_vline(aes(xintercept=mean(data[,lst.eta[i]]),col="Mean",linetype = "Mean"),size=1.2)+
-  scale_colour_manual(name="",
-                      values=c(Mean="red", Zero="blue"))+
-  scale_linetype_manual(name="", values = c(Mean = "dashed", Zero = "dashed"))+
-  theme_bw()+
-  theme(legend.position = c(0.8, 0.8),legend.background = element_rect(fill=NULL,colour =NULL))
-myplots[[i]]<-p1
-}
-ggarrange(plotlist = myplots,ncol=ncol, nrow=nrow, common.legend = TRUE, legend="bottom")
+  limx<-c(min(data[,lst.eta]),max(data[,lst.eta]))
+  myplots <- list()
+  for (i in 1:length(lst.eta)) {
+    p1 <- ggplot2::ggplot(data, aes_string(x = lst.eta[i])) +
+      geom_density(fill = "royalblue3", col = NA, alpha = 0.3, bin = 60)+
+      geom_histogram(aes_string(x = lst.eta[i],y = "..density.."), fill = NA, col = "black") +
+      xlab(xname[i]) + ylab("Density") + scale_linetype_manual(name = "", values = c(Mean = "dashed",
+                                                                                     Zero = "dashed")) +xlim(limx)+
+      geom_vline(aes(xintercept = 0,col = "Zero", linetype = "Zero"), size = 1.2) +
+      geom_vline(aes(xintercept = mean(data[,lst.eta[i]]),col = "Mean", linetype = "Mean"),
+                 size = 1.2) +
+      scale_colour_manual(name = "",values = c(Mean = "red", Zero = "blue")) +
+      theme_bw() +
+      theme(legend.position = c(0.8,0.8), legend.background = element_rect(fill = NULL,colour = NULL))
+
+    myplots[[i]] <- p1
+  }
+  ggarrange(plotlist = myplots, ncol = ncol, nrow = nrow, common.legend = TRUE,
+            legend = "bottom")
 }
 
 #' DISTRIBUTION OF CWRES internal
