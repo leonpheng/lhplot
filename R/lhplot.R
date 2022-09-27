@@ -1,4 +1,38 @@
 ####BOXPLOT
+#' Prepare dataset for Forest plot in Shiny App
+#'
+#' Generate dataset for coveffectsplot
+#' @param data data frame (prepare categorical covariates before hand)
+#' @param parameter list of parameters
+#' @param catcov list categorical covariates.
+#' @param stats define statistics for mid, lower and upper.
+#' @param N number of subjects to be included
+#' @keywords
+#' @export
+#' @examples dat<-forest.dat(data=t,parameter=c("Cmax..ng.mL.","AUCtau..ng.h.mL."),catcov=c("Cohort","WT_group"),stats=c("quantile(x,0.5)=mid","quantile(x,0.05)=lower","quantile(x,0.95)=upper","length(x)=n"))
+#' @examples Save dataset as CSV then open shiny APP using coveffectsplot::run_interactiveforestplot(). The package could be installed from Github: devtools::install_github('smouksassi/coveffectsplot')
+
+
+forest.dat<-function(data=t,parameter=c("Cmax..ng.mL.","AUCtau..ng.h.mL."),catcov=c("Cohort","WT_group"),stats=c("quantile(x,0.5)=mid","quantile(x,0.05)=lower","quantile(x,0.95)=upper","length(x)=n"),N=T)
+  {
+  tx1<-NULL
+  for(i in catcov){
+    tx<-lhtool2::addvar2(data,i,parameter,fun=stats)%>%
+      rename(paramname=var)
+    if(N){
+      tx[,i]<-paste0(tx[,i]," \n (N=",tx$n,")")}
+    tx<-lhtool2::lhlong(tx,i)%>%
+      rename(covname=variable,label=value)%>%
+      select(paramname,covname,label,mid,lower,upper)
+    tx1<-rbind(tx1,tx)
+    }
+  tx1
+}
+
+
+
+
+####BOXPLOT
 #' CATEGORICAL vs CONTINUOUS BOXPLOT
 #'
 #' Generate COVAR CAT vs CONT
