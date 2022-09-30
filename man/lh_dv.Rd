@@ -26,6 +26,5 @@ Generate plot with sort color of observe
 }
 \examples{
 lh_dv(...)
-
 }
 \keyword{lh_dv}

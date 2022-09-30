@@ -1,3 +1,15 @@
+#############################################
+#' Tips for plot
+#'
+#' tips for plot
+#' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
+#' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
+
+tips.plot<-function(...){
+  print(list(c("Tips: axis label: use expression for subscript=brackets, superscript= hat ex: ylab(expression(C^2~[max][doublequot,doublequot][inf]~doublequot(\U03BCg/mL)doublequot))"),c(
+        "Greek unicode slash and U03 then B1=alpha, B2=beta,B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda,BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega") ))
+}
+
 ####BOXPLOT
 #' Prepare dataset for Forest plot in Shiny App
 #'
@@ -254,6 +266,8 @@ lh_cwres<-function(data,y="CWRES",
 #' @keywords lh_dv
 #' @export
 #' @examples lh_dv(...)
+#' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
+#' @example  Greek unicode slash and U03B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 #'
 lh_dv<-function(data,y="DV",
                 x="IPRED",type="log",scale="auto",
@@ -321,6 +335,8 @@ lh_dv<-function(data,y="DV",
 #' @keywords lh_dv_strat
 #' @export
 #' @examples lh_dv_strat(...)
+#' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
+#' @example  Greek unicode slash and U03B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 
 lh_dv_strat<-function(data,x,y,id,xlab="Individual Predictions (\U03BCg/mL)",ylab="Observed\n Concentrations (\U03BCg/mL)",by="Age_Group"){
   data$x<-data[,x]
@@ -354,6 +370,9 @@ ggplot(data,aes(x,y,label=id))+
 #' @keywords lh_cwres_strat
 #' @export
 #' @examples lh_cwres_strat(...)
+#' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
+#' @example  Greek unicode slash and U03B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
+#'
 lh_cwres_strat<-function(data,x,y,id,xlab="Population Predictions (\U03BCg/mL)",ylab="Conditional Weighted Residual",by="Age_Group"){
   data$x<-data[,x]
   data$y<-data[,y]
@@ -397,6 +416,8 @@ ggplot(data,aes(x,y,label=id))+
 #' @examples low.targ.line=rf$Cmaxsslow,
 #' @examples high.targ.line=rf$Cmaxsshi,
 #' @examples add.target="yes",
+#' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
+#' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 #' @examples add.obs.point="yes",
 #' @examples add.stats="yes",
 #' @examples stat.label.space=c(0.1,0.2),jit=c(0.15,0)) +theme_bw()+ theme(axis.text.x #' @examples = element_text(angle = 45, hjust = 1))+scale_y_log10()
@@ -517,6 +538,8 @@ lhboxplot2<-function(data,y,x,x.title,y.title,low.targ.line,high.targ.line,add.t
 #' @export
 #' @examples p1<-lh_dv_ipred(dat1,type="lin",IPREDN="IPRED")
 #' @examples p2<-lh_dv_ipred(dat1,type="log")
+#' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
+#' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 
 lh_dv_x<-function (data, y = "DV", x = "IPRED", type = "log",
                    scale = c(0.1, 100), IPREDN = "Individual Predicted Concentration (ng/mL)",
@@ -554,6 +577,9 @@ lh_dv_x<-function (data, y = "DV", x = "IPRED", type = "log",
 #' @export
 #' @examples p1<-lh_dv_ipred(dat1,type="lin",IPREDN="IPRED")
 #' @examples p2<-lh_dv_ipred(dat1,type="log")
+#' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
+#' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
+
 lh_dv_ipred<-function(data,y="DV",
                  x="IPRED",type="log",scale=c(0.1,100),
               IPREDN="Individual Predicted Concentration (ng/mL)",
@@ -605,6 +631,8 @@ p
 #' @export
 #' @examples p1<-lh_dv_pred(dat1,type="lin",IPREDN="IPRED")
 #' @examples p2<-lh_dv_pred(dat1,type="log",scale="auto")
+#' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
+#' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 
 lh_dv_pred<-function(data,y="DV",
                       x="PRED",type="log",scale=c(0.1,100),
@@ -657,6 +685,8 @@ lh_dv_pred<-function(data,y="DV",
 #' @export
 #' @examples data$TAD<-data$TAD;p1<-lh_cwres_tad(dat1)
 #' @examples p2<-lh_cwres_tad(dat1)
+#' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
+#' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 
 
 lh_cwres_tad<-function(data,y="CWRES",
@@ -708,6 +738,8 @@ p
 #' @export
 #' @examples data$TIME<-data$RTIME;p1<-lh_cwres_time(dat1)
 #' @examples p2<-lh_cwres_time(dat1)
+#' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
+#' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 
 
 lh_cwres_time<-function(data,y="CWRES",
@@ -777,6 +809,8 @@ lh_cwres_time<-function(data,y="CWRES",
 #' @export
 #' @examples p1<-lh_cwres_pred(dat1)
 #' @examples p2<-lh_cwres_pred(dat1)
+#' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
+#' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 
 lh_cwres_x<-function(data,y="CWRES",
                         x="PREDN",type="log",scale=c(0.1,100),
@@ -840,6 +874,8 @@ p
 #' @export
 #' @examples p1<-lh_cwres_pred(dat1)
 #' @examples p2<-lh_cwres_pred(dat1)
+#' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
+#' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 
 lh_cwres_pred<-function(data,y="CWRES",
                         x="PRED",type="log",scale=c(0.1,100),
@@ -908,6 +944,8 @@ lh_cwres_pred<-function(data,y="CWRES",
 #' @export
 #' @examples lh_gof("test.png")
 #' @examples lh_gof()
+#' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
+#' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 
 lh_gof<-function(file.name=NULL){
 p1<-lh_dv_ipred(dat1,type="lin",IPREDN="IPRED")
@@ -936,6 +974,9 @@ p
 #' @export
 #' @examples p1<-lh_cat_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
 #' @examples p2<-lh_gof()
+#' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
+#' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
+
 lh_cat_cov<-function(data,lst.eta=c("ETA1"),lst.cov=c("SEX","RACE"),save.path=NULL,fancy="yes"){
   cat1 <- lhlong(data, lst.cov)
   names(cat1)[names(cat1) == "variable"] <- "Covariate"
@@ -1003,6 +1044,8 @@ lh_cat_cov<-function(data,lst.eta=c("ETA1"),lst.cov=c("SEX","RACE"),save.path=NU
 #' @keywords lh_con_cov
 #' @export
 #' @examples p1<-lh_con_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
+#' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
+#' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 
 lh_eta_dist<-function (data=eta1, lst.eta =c("Ka","F","Vc"), ncol = 3, nrow = 2, fancy = "yes")
 {
@@ -1041,6 +1084,8 @@ lh_eta_dist<-function (data=eta1, lst.eta =c("Ka","F","Vc"), ncol = 3, nrow = 2,
 #' @keywords qqplot.cwres
 #' @export
 #' @examples p1<-lh_con_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
+#' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
+#' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 
 qqplot.cwres <- function(dat, ...) {
   ylim <-c(-10, 10)
@@ -1098,6 +1143,8 @@ dev.off()}
 #' @examples plh_indiv_plot(data=dat1,id="usubjid",n.plots.page=9,time="time",dv="dv",ipred="ipred"#' #' @examples ,pred="pred",type="linear",
 #' @examples xtit="Time after first dose (h)",
 #' @examplesytit="Concentration (ng/mL)",output.name="Individiual.docx")
+#' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
+#' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 
 lh_indiv_plot<-function(data,id="usubjid",n.plots.page=9,time="time",dv="dv",ipred="ipred",pred="pred",type="linear",xtit="Time after first dose (h)",ytit="Concentration (ng/mL)",output.name="./test.docx")
   {
@@ -1147,6 +1194,8 @@ lh_indiv_plot<-function(data,id="usubjid",n.plots.page=9,time="time",dv="dv",ipr
 #' @examples lh_explor_ind(data=dat1,id="usubjid",n.plots.page=9,time="time",dv="dv",ipred="ipred"#' #' @examples ,pred="pred",type="linear",
 #' @examples xtit="Time after first dose (h)",
 #' @examplesytit="Concentration (ng/mL)",output.name="Individiual.docx")
+#' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
+#' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 
 lh_explor_ind<-function(data,dose="amt",id="id",n.plots.page=9,time="time",dv="dv",ipred=NULL,pred=NULL,type="linear",xtit="Time after first dose (h)",ytit="Concentration (ng/mL)",output.name="./test.docx")
 {
@@ -1204,6 +1253,8 @@ p<-ggplot2::ggplot(ddat[is.na(ddat$amt),],aes_string(x=time,y=dv))+
 #' @keywords lh_con_cov
 #' @export
 #' @examples p1<-lh_con_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
+#' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
+#' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 
 lh_con_cov<-function(data,lst.eta=c("eta1","eta2"),lst.cov=c("AGE","WT"),save.path="./scatter.png",fancy="yes"){
   library(lattice)
