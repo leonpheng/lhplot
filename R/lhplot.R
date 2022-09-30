@@ -2,14 +2,15 @@
 #' Tips for plot
 #'
 #' tips for plot
+#' @keywords
+#' @export
 #' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
 #' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
-#' @export
-#'
+
 tips.plot<-function(...){
-  list(c("Tips: axis label: use expression for subscript=brackets, superscript= hat ex: ylab(expression(C^2~[max][doublequot,doublequot][inf]~doublequot(\U03BCg/mL)doublequot))"),c(
+  print(list(c("Tips: axis label: use expression for subscript=brackets, superscript= hat ex: ylab(expression(C^2~[max][doublequot,doublequot][inf]~doublequot(\U03BCg/mL)doublequot))"),c(
         "Greek unicode slash and U03 then B1=alpha, B2=beta,B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda,BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega"))
-}
+)}
 
 ####BOXPLOT
 #' Prepare dataset for Forest plot in Shiny App
