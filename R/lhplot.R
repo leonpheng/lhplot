@@ -408,9 +408,9 @@ ggplot(data,aes(x,y,label=id))+
 #'
 #' Generate boxplot with targets and stats
 #' @param data data frame
-#' @keywords lhboxplot2
+#' @keywords lh_boxplot2
 #' @export
-#' @examples lhboxplot2(data=rall,
+#' @examples lh_boxplot2(data=rall,
 #' @examples y="Cmaxss",
 #' @examples x="Label",
 #' @examples x.title="Group",
@@ -420,24 +420,43 @@ ggplot(data,aes(x,y,label=id))+
 #' @examples add.target="yes",
 #' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
 #' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
-#' @examples add.obs.point="yes",
+#' @examples add.obs.point="yes", tips: GE>= (\+U2265), LE<= (\+U2264)
 #' @examples add.stats="yes",
 #' @examples stat.label.space=c(0.1,0.2),jit=c(0.15,0)) +theme_bw()+ theme(axis.text.x #' @examples = element_text(angle = 45, hjust = 1))+scale_y_log10()
 
-lhboxplot2<-function(data,y,x,x.title,y.title,low.targ.line,high.targ.line,add.target="no",add.obs.point="no",add.stats="no",stat.label.space=c(0.1,0.2),jit=c(0.1,0.1))
+lh_boxplot2<-function(data,y,x,x.title,y.title,target=c(1,5),add.obs.point="no",add.stats="no",
+                      stat.label.space=c(0.1,0.2),jit=c(0.1,0.1),
+                      targ.line.size=1,targ.text.size=3,
+                      targ.text.col=c('blue','green4','red'),
+                      targ.line.col=c('blue',"red"),
+                      color.target.cuttoff=80,
+                      outlier="no",
+                      transparency=0.5,
+                      obs.color="grey",
+                      obs.size=1,
+                      target.line.type=c("solid","dashed"),
+                      legend.title="Target Attainment",
+                      x.label.angle=45
+)
 {
   #Compute target attainment
   library(ggplot2)
+  library(tidyverse)
+  library(dplyr)
   xti=x.title
   yti=y.title
-  lowt=low.targ.line
-  hit=high.targ.line
+
+  lowt=target[1]
+  hit=target[2]
+
   obs=add.obs.point
   prop=add.stats
   space=stat.label.space
-  setdiff(c(x,y,lowt,hit),names(df))
+  #setdiff(c(x,y,lowt,hit),names(df))
+
   s1<-data[,c(x,y)]
   s1<-s1[order(s1[,x]),]
+
   s1$hit<-hit
   s1$lowt<-lowt
 
@@ -460,6 +479,8 @@ lhboxplot2<-function(data,y,x,x.title,y.title,low.targ.line,high.targ.line,add.t
   targ$hi<-with(targ,round(hi/n*100,1))
   targ$wi<-with(targ,round(wi/n*100,1))
   targ$lo<-with(targ,round(lo/n*100,1))
+
+
   #Highlight greater % by inclreasing font size
   for(i in 1:nrow(targ)){
     targ$si1[i]<-ifelse(targ$wi[i]==max(targ[i,c("hi","wi","lo")]),3,2)
@@ -467,14 +488,13 @@ lhboxplot2<-function(data,y,x,x.title,y.title,low.targ.line,high.targ.line,add.t
     targ$si3[i]<-ifelse(targ$lo[i]==max(targ[i,c("hi","wi","lo")]),3,2)
   }
 
+
   var<-y
   targ$hi<-with(targ,paste0(hi,"%"))
   targ$wi<-with(targ,paste0(wi,"%"))
   targ$lo<-with(targ,paste0(lo,"%"))
   targ$allt<-with(targ,paste(hi,wi,lo,sep="\n"))
 
-  head(s1)
-  s1[,c("f","lowt")]
   lowtar<-nodup(s1,"f","add",c("lowt","hit","y"))
 
   var<-y
@@ -482,50 +502,88 @@ lhboxplot2<-function(data,y,x,x.title,y.title,low.targ.line,high.targ.line,add.t
   targ$f<-"dum"
   targ2<-dplyr::left_join(targ,coord)
 
-  targ2$ma1<-targ2$max1+(space[2]*targ2$max1)
-  targ2$me1<-targ2$max1+(space[1]*targ2$max1)
-  targ2$mi1<-targ2$max1
+  targ2$ma1<-targ2$max1+(space[3]*targ2$max1)
+  targ2$me1<-targ2$max1+(space[2]*targ2$max1)
+  targ2$mi1<-targ2$max1+(space[1]*targ2$max1)
   targ2$x<-targ2[,x]
   #targ2$f<-targ2[,facet]
 
-  head(s1)
 
-  p0<-ggplot(s1,aes(x=x,y=y))
+
+  targ2$mid<-as.numeric(gsub("%","",targ2$wi))
+  targ2$upper<-as.numeric(gsub("%","",targ2$hi))
+  targ2$lower<-as.numeric(gsub("%","",targ2$lo))
+
+
+
+  if(!is.null(color.target.cuttoff)){
+    lab1<-paste0("Low target \U2265",color.target.cuttoff,"%")
+    lab2<-paste0("Mid target \U2265",color.target.cuttoff,"%")
+    lab3<-paste0("High target \U2265",color.target.cuttoff,"%")
+    targ2$type1<-"Off target"
+    targ2$type1[targ2$mid>=color.target.cuttoff]<-lab2
+    targ2$type1[targ2$upper>=color.target.cuttoff]<-lab3
+    targ2$type1[targ2$lower>=color.target.cuttoff]<-lab1
+
+    targ2$col<-"grey"
+    targ2$col[targ2$type1==lab2]<-"green"
+    targ2$col[targ2$type1==lab3]<-"red"
+    targ2$col[targ2$type1==lab1]<-"blue"
+
+
+    targ2<-lhfactor(targ2,"type1","col")
+
+
+    s1<-s1%>%
+      left_join(targ2[,c("x","type1","col")])
+
+    #sort(as.factor(unique(s1$x)))
+    #sort(as.factor(unique(s1$col)))
+    s1<-reflag(s1,"col",c("grey","blue","green","red"))
+    s1<-lhfactor(s1,"col","type1")
+    col<-sort(as.factor(unique(s1$col)))
+  }
+
+
+  if(!is.null(color.target.cuttoff)){
+    p0<-ggplot(s1,aes(x=x,y=y,fill=as.factor(type1)))
+  }else{p0<-ggplot(s1,aes(x=x,y=y))}
+
+  if(outlier=="no"){
+    p0<- p0+ geom_boxplot(outlier.shape ="", alpha =transparency)+
+      xlab(xti)+ylab(yti)}else{
+        p0<- p0+ geom_boxplot(alpha =transparency)+
+          xlab(xti)+ylab(yti)
+      }
+
   if(obs=="yes"){
-    p0<-p0+geom_jitter(width =jit[1], height =jit[2],col="gray",size=0.4)
+    p0<-p0+geom_jitter(width =jit[1], height =jit[2],col=obs.color,alpha=transparency,size=obs.size)
   }
 
-  p0<- p0+ geom_boxplot(outlier.shape ="", alpha = 0.5)+
-    xlab(xti)+ylab(yti)
-  # if(!is.null(facet)){
-  #   p0<-p0+facet_wrap(~f,scale="free")
-  # }
-  #if(obs=="yes"){
-  #    p0<-p0+geom_jitter(width =jit[1], height =jit[2],col="gray",size=0.4)
-  #  }
 
-
-
-  if(add.target=="yes"){
-
-    p0<-p0+ geom_hline(data=lowtar,aes(yintercept=lowt), linetype="dashed", color = "green4")+
-      geom_hline(data=lowtar,aes(yintercept=hit), linetype="dashed", color = "green4")
+  if(!is.null(target)){
+    p0<-p0+ geom_hline(data=lowtar,aes(yintercept=lowt), linetype=target.line.type[1], color =targ.line.col[1],size=targ.line.size)+
+      geom_hline(data=lowtar,aes(yintercept=hit), linetype=target.line.type[2], color =targ.line.col[2],size=targ.line.size)
+  }
+  if(!is.null(color.target.cuttoff)){
+    p0<-p0+scale_fill_manual(values=as.character(col))+theme_bw()+guides(fill=guide_legend(title=legend.title))
 
   }
-
   if(prop=="yes"){
     if(hit==lowt){
-      p0<-p0+geom_text(data=targ2, aes(x=x, y=me1, label=lo), col='red', size=3)+
-        #geom_text(data=targ2, aes(x=x, y=me1, label=wi), col='blue', size=targ2$si1)+
-        geom_text(data=targ2, aes(x=x, y=ma1, label=hi), col='green4', size=2)
-    }else{p0<-p0+geom_text(data=targ2, aes(x=x, y=mi1, label=lo), col='red', size=2)+
-      geom_text(data=targ2, aes(x=x, y=me1, label=wi), col='green4', size=2)+
-      geom_text(data=targ2, aes(x=x, y=ma1, label=hi), col='red', size=2)
-    # +
-    # annotate("rect", xmin=hitar$x[1], xmax=hitar$x[2], ymin=lowtar$y[1], ymax=hitar$y[2], alpha=0.2, fill="red")
+      p0<-p0+geom_text(data=targ2, aes(x=x, y=me1, label=lo), col=targ.line.col[1], size=targ.text.size)+
+        geom_text(data=targ2, aes(x=x, y=ma1, label=hi), col=targ.line.col[2], size=targ.text.size)
+    }else{
+      p0<-p0+geom_text(data=targ2, aes(x=x, y=mi1,label=lo), col=targ.text.col[1], size=targ.text.size)+
+        geom_text(data=targ2, aes(x=x, y=me1, label=wi), col=targ.text.col[2], size=targ.text.size)+
+        geom_text(data=targ2, aes(x=x, y=ma1, label=hi), col=targ.text.col[3], size=targ.text.size)
+      # +
+      #annotate("rect", xmin=hitar$x[1], xmax=hitar$x[2], ymin=lowtar$y[1], ymax=hitar$y[2], alpha=0.2, fill="red")
     }
+    p0<-p0 + theme(axis.text.x=element_text(angle =x.label.angle))
   }
   p0
+
 }
 
 
