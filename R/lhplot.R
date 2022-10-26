@@ -1206,44 +1206,57 @@ dev.off()}
 #' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
 #' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 
-lh_indiv_plot<-function(data,id="usubjid",n.plots.page=9,time="time",dv="dv",ipred="ipred",pred="pred",type="linear",xtit="Time after first dose (h)",ytit="Concentration (ng/mL)",output.name="./test.docx")
-  {
+lh_indiv_plot<-function (data, id = "usubjid", n.plots.page = 9, time = "time",
+                         dv = "dv", ipred = "ipred", pred = "pred",smooth="no",
+                         type = "linear", xtit = "Time after first dose (h)",
+                         ytit = "Concentration (ng/mL)", output.name = "./test.docx")
+{
   library(scales)
   library(ggplot2)
-  npepage<-n.plots.page
-  n<-length(unique(data[,id]))
-  page<-1:ceiling(n/npepage)
-  nb_pg2<-page*9
-  nb_pg1<-c(1,nb_pg2[1:(length(nb_pg2)-1)]+1)
+  dir.create("./ind.plots")
+  npepage <- n.plots.page
+  n <- length(unique(data[, id]))
+  page <- 1:ceiling(n/npepage)
+  nb_pg2 <- page * 9
+  nb_pg1 <- c(1, nb_pg2[1:(length(nb_pg2) - 1)] + 1)
+  doc <- officer::read_docx()
+  for (i in 1:length(nb_pg2)) {
+    ddat <- data[data[, id] %in% unique(data[, id])[nb_pg1[i]:nb_pg2[i]],
+    ]
+    ddat$usubjid <- ddat[, id]
+    break2 <- c(1e-04, 5e-04, 0.001, 0.005, 0.1, 0.5, 1,
+                5, 10, 100, 10^3, 10^4, 10^5, 10^6)
+    ddat$TIME<-ddat[,time]
+    ddat$DV<-ddat[,dv]
+    p <- ggplot(ddat, aes(x =TIME, y = DV)) +
+      geom_point(aes(col = "Observed"))
 
-  doc<-officer::read_docx()
-  for(i in 1:length(nb_pg2)){
-    ddat<-data[data[,id]%in%unique(data[,id])[nb_pg1[i]:nb_pg2[i]],]
-    ddat$usubjid<-ddat[,id]
-    break2<-c(0.0001,0.0005,0.001,0.005,0.1,0.5,1,5,10,100,10^3,10^4,10^5,10^6)
-  p<-ggplot2::ggplot(ddat,aes_string(x=time,y=dv))+
-      ggplot2::geom_point(aes(col="Observed"))
-    if(!is.null(ipred)){
-      p<-p+ggplot2::geom_line(aes(y=ipred,col="IPRED"))
+    if (!is.null(ipred)) {
+      ddat$IPRED<-ddat[,ipred]
+      p <- p + geom_line(aes(y =IPRED, col = "IPRED"))
     }
-    if(!is.null(pred)){
-      p<-p+ggplot2::geom_line(aes(y=pred,col="PRED"))
+    if (!is.null(pred)) {
+      ddat$PRED<-ddat[,pred]
+      p <- p + geom_line(aes(y = PRED, col = "PRED"))
     }
-    p<-p+ggplot2::facet_wrap(~usubjid,scales="free")
-    if(type=="log"){
-    p=p+ ggplot2::scale_y_log10(breaks = break2)}
-    p=p+ ggplot2::scale_x_continuous()+
-      ggplot2::xlab(xtit)+ggplot2::ylab(ytit)+
-      ggplot2::theme_bw()+
-      ggplot2::theme(legend.title=element_blank())
 
-    doc<-officer::body_add_gg(doc,p,width=7.08,height=5.9)
+    p <- p + ggplot2::facet_wrap(~usubjid, scales = "free")
+
+    if (type == "log") {
+      p = p + ggplot2::scale_y_log10(breaks = break2)
+    }
+    p = p + ggplot2::scale_x_continuous() + ggplot2::xlab(xtit) +
+      ggplot2::ylab(ytit) + ggplot2::theme_bw() + ggplot2::theme(legend.title = element_blank())
+    nm<-paste0("./ind.plots/page_",i,"_",type,".png")
+    ggsave(nm,p)
+    doc <- officer::body_add_gg(doc, p, width = 7.08, height = 5.9)
   }
-  if(!is.null(output.name)){
-  print(doc,output.name)}else{doc}
+  if (!is.null(output.name)) {
+    print(doc, output.name)
+  }else {
+    doc
+  }
 }
-
-
 #' EXPLORATORY Individual plots
 #'
 #' Generate DATA

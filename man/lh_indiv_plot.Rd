@@ -12,6 +12,7 @@ lh_indiv_plot(
   dv = "dv",
   ipred = "ipred",
   pred = "pred",
+  smooth = "no",
   type = "linear",
   xtit = "Time after first dose (h)",
   ytit = "Concentration (ng/mL)",
