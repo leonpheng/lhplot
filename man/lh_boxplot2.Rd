@@ -25,8 +25,7 @@ lh_boxplot2(
   obs.color = "grey",
   obs.size = 1,
   target.line.type = c("solid", "dashed"),
-  legend.title = "Target Attainment",
-  x.label.angle = 45
+  legend.title = "Target Attainment"
 )
 }
 \arguments{

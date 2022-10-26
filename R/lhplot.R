@@ -435,9 +435,7 @@ lh_boxplot2<-function(data,y,x,x.title,y.title,target=c(1,5),add.obs.point="no",
                       obs.color="grey",
                       obs.size=1,
                       target.line.type=c("solid","dashed"),
-                      legend.title="Target Attainment",
-                      x.label.angle=45
-)
+                      legend.title="Target Attainment")
 {
   #Compute target attainment
   library(ggplot2)
@@ -490,9 +488,9 @@ lh_boxplot2<-function(data,y,x,x.title,y.title,target=c(1,5),add.obs.point="no",
 
 
   var<-y
-  targ$hi<-with(targ,paste0(hi,"%"))
-  targ$wi<-with(targ,paste0(wi,"%"))
-  targ$lo<-with(targ,paste0(lo,"%"))
+  targ$hi<-with(targ,paste0(round(hi,0),"%"))
+  targ$wi<-with(targ,paste0(round(wi,0),"%"))
+  targ$lo<-with(targ,paste0(round(lo,0),"%"))
   targ$allt<-with(targ,paste(hi,wi,lo,sep="\n"))
 
   lowtar<-nodup(s1,"f","add",c("lowt","hit","y"))
@@ -508,19 +506,16 @@ lh_boxplot2<-function(data,y,x,x.title,y.title,target=c(1,5),add.obs.point="no",
   targ2$x<-targ2[,x]
   #targ2$f<-targ2[,facet]
 
-
-
   targ2$mid<-as.numeric(gsub("%","",targ2$wi))
   targ2$upper<-as.numeric(gsub("%","",targ2$hi))
   targ2$lower<-as.numeric(gsub("%","",targ2$lo))
 
-
-
   if(!is.null(color.target.cuttoff)){
+    lab0<-paste0("Off target (<",color.target.cuttoff,"%)")
     lab1<-paste0("Low target \U2265",color.target.cuttoff,"%")
     lab2<-paste0("Mid target \U2265",color.target.cuttoff,"%")
     lab3<-paste0("High target \U2265",color.target.cuttoff,"%")
-    targ2$type1<-"Off target"
+    targ2$type1<-lab0
     targ2$type1[targ2$mid>=color.target.cuttoff]<-lab2
     targ2$type1[targ2$upper>=color.target.cuttoff]<-lab3
     targ2$type1[targ2$lower>=color.target.cuttoff]<-lab1
@@ -566,7 +561,7 @@ lh_boxplot2<-function(data,y,x,x.title,y.title,target=c(1,5),add.obs.point="no",
       geom_hline(data=lowtar,aes(yintercept=hit), linetype=target.line.type[2], color =targ.line.col[2],size=targ.line.size)
   }
   if(!is.null(color.target.cuttoff)){
-    p0<-p0+scale_fill_manual(values=as.character(col))+theme_bw()+guides(fill=guide_legend(title=legend.title))
+    p0<-p0+scale_fill_manual(values=as.character(col))+guides(fill=guide_legend(title=legend.title))
 
   }
   if(prop=="yes"){
@@ -580,7 +575,7 @@ lh_boxplot2<-function(data,y,x,x.title,y.title,target=c(1,5),add.obs.point="no",
       # +
       #annotate("rect", xmin=hitar$x[1], xmax=hitar$x[2], ymin=lowtar$y[1], ymax=hitar$y[2], alpha=0.2, fill="red")
     }
-    p0<-p0 + theme(axis.text.x=element_text(angle =x.label.angle))
+    p0<-p0+theme_bw()
   }
   p0
 
