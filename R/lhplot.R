@@ -1204,7 +1204,7 @@ dev.off()}
 lh_indiv_plot<-function (data, id = "usubjid", n.plots.page = 9, time = "time",
                          dv = "dv", ipred = "ipred", pred = "pred",smooth="no",
                          type = "linear", xtit = "Time after first dose (h)",
-                         ytit = "Concentration (ng/mL)", output.name = "./test.docx")
+                         ytit = "Concentration (ng/mL)", output.name = "./ind.plots/individual_plots.docx")
 {
   library(scales)
   library(ggplot2)
@@ -1212,7 +1212,7 @@ lh_indiv_plot<-function (data, id = "usubjid", n.plots.page = 9, time = "time",
   npepage <- n.plots.page
   n <- length(unique(data[, id]))
   page <- 1:ceiling(n/npepage)
-  nb_pg2 <- page * 9
+  nb_pg2 <- page * n
   nb_pg1 <- c(1, nb_pg2[1:(length(nb_pg2) - 1)] + 1)
   doc <- officer::read_docx()
   for (i in 1:length(nb_pg2)) {
@@ -1238,18 +1238,35 @@ lh_indiv_plot<-function (data, id = "usubjid", n.plots.page = 9, time = "time",
     p <- p + ggplot2::facet_wrap(~usubjid, scales = "free")
 
     if (type == "log") {
-      p = p + ggplot2::scale_y_log10(breaks = break2)
+    p = p + ggplot2::scale_y_log10(breaks = break2)
     }
+
+    if (type == "both") {
+      p1 = p + ggplot2::scale_y_log10(breaks = break2)
+      p1 = p1 + ggplot2::scale_x_continuous() + ggplot2::xlab(xtit) +
+        ggplot2::ylab(ytit) + ggplot2::theme_bw() + ggplot2::theme(legend.title = element_blank())
+    }
+
     p = p + ggplot2::scale_x_continuous() + ggplot2::xlab(xtit) +
       ggplot2::ylab(ytit) + ggplot2::theme_bw() + ggplot2::theme(legend.title = element_blank())
+
+    if(type !="both"){
     nm<-paste0("./ind.plots/page_",i,"_",type,".png")
+    ggsave(nm,p)}
+
+    if (type == "both"){
+    nm<-paste0("./ind.plots/page_",i,"_lin",".png")
     ggsave(nm,p)
-    doc <- officer::body_add_gg(doc, p, width = 7.08, height = 5.9)
-  }
+    nm<-paste0("./ind.plots/page_",i,"_log",".png")
+    ggsave(nm,p1)
+    }
+  doc <- officer::body_add_gg(doc, p, width = 7.08, height = 5.9)
+    if (type == "both"){
+      doc <- officer::body_add_gg(doc, p1, width = 7.08, height = 5.9)}
+
   if (!is.null(output.name)) {
     print(doc, output.name)
-  }else {
-    doc
+  }
   }
 }
 #' EXPLORATORY Individual plots

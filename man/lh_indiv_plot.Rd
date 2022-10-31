@@ -16,7 +16,7 @@ lh_indiv_plot(
   type = "linear",
   xtit = "Time after first dose (h)",
   ytit = "Concentration (ng/mL)",
-  output.name = "./test.docx"
+  output.name = "./ind.plots/individual_plots.docx"
 )
 }
 \arguments{
