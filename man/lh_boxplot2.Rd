@@ -5,15 +5,20 @@
 \title{BOXPLOT MC SIMULATION}
 \usage{
 lh_boxplot2(
-  data,
-  y,
-  x,
-  x.title,
+  data = NULL,
+  y.dat = NULL,
+  x.dat = NULL,
+  x.title = NULL,
   y.title,
   target = c(1, 5),
   add.obs.point = "no",
   add.stats = "no",
   stat.label.space = c(0.1, 0.2),
+  max.y = NULL,
+  min.y = 0,
+  increm.y = 100,
+  box.stats = c("quantile(x,0.05)", "quantile(x,0.25)", "quantile(x,0.5)",
+    "quantile(x,0.75)", "quantile(x,0.95)"),
   jit = c(0.1, 0.1),
   targ.line.size = 1,
   targ.text.size = 3,
@@ -25,7 +30,10 @@ lh_boxplot2(
   obs.color = "grey",
   obs.size = 1,
   target.line.type = c("solid", "dashed"),
-  legend.title = "Target Attainment"
+  legend.title = "Target Attainment",
+  targ.legend = c("missed", "below adult geomeans at 400 mg BID",
+    "between adult geomeans at 400 & 1200 mg BID",
+    "Simulated median above adult geomean at 1200 mg BID")
 )
 }
 \arguments{
@@ -36,8 +44,8 @@ Generate boxplot with targets and stats
 }
 \examples{
 lh_boxplot2(data=rall,
-y="Cmaxss",
-x="Label",
+y.dat="Cmaxss",
+x.dat="Label",
 x.title="Group",
 y.title="AUCss",
 low.targ.line=rf$Cmaxsslow,

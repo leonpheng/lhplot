@@ -411,8 +411,8 @@ ggplot(data,aes(x,y,label=id))+
 #' @keywords lh_boxplot2
 #' @export
 #' @examples lh_boxplot2(data=rall,
-#' @examples y="Cmaxss",
-#' @examples x="Label",
+#' @examples y.dat="Cmaxss",
+#' @examples x.dat="Label",
 #' @examples x.title="Group",
 #' @examples y.title="AUCss",
 #' @examples low.targ.line=rf$Cmaxsslow,
@@ -424,9 +424,21 @@ ggplot(data,aes(x,y,label=id))+
 #' @examples add.stats="yes",
 #' @examples stat.label.space=c(0.1,0.2),jit=c(0.15,0)) +theme_bw()+ theme(axis.text.x #' @examples = element_text(angle = 45, hjust = 1))+scale_y_log10()
 
-lh_boxplot2<-function(data,y,x,x.title,y.title,target=c(1,5),add.obs.point="no",add.stats="no",
-                      stat.label.space=c(0.1,0.2),jit=c(0.1,0.1),
-                      targ.line.size=1,targ.text.size=3,
+lh_boxplot2<-function(data=NULL,
+                      y.dat=NULL,
+                      x.dat=NULL,
+                      x.title=NULL,
+                      y.title,target=c(1,5),
+                      add.obs.point="no",
+                      add.stats="no",
+                      stat.label.space=c(0.1,0.2),
+                      max.y=NULL,
+                      min.y=0,
+                      increm.y=100,
+                      box.stats=c("quantile(x,0.05)","quantile(x,0.25)","quantile(x,0.5)","quantile(x,0.75)","quantile(x,0.95)"),
+                      jit=c(0.1,0.1),
+                      targ.line.size=1,
+                      targ.text.size=3,
                       targ.text.col=c('blue','green4','red'),
                       targ.line.col=c('blue',"red"),
                       color.target.cuttoff=80,
@@ -435,12 +447,15 @@ lh_boxplot2<-function(data,y,x,x.title,y.title,target=c(1,5),add.obs.point="no",
                       obs.color="grey",
                       obs.size=1,
                       target.line.type=c("solid","dashed"),
-                      legend.title="Target Attainment")
+                      legend.title="Target Attainment",
+                      targ.legend=c("missed","below adult geomeans at 400 mg BID",
+                      "between adult geomeans at 400 & 1200 mg BID","Simulated median above adult geomean at 1200 mg BID"))
 {
   #Compute target attainment
   library(ggplot2)
   library(tidyverse)
   library(dplyr)
+
   xti=x.title
   yti=y.title
 
@@ -452,27 +467,28 @@ lh_boxplot2<-function(data,y,x,x.title,y.title,target=c(1,5),add.obs.point="no",
   space=stat.label.space
   #setdiff(c(x,y,lowt,hit),names(df))
 
-  s1<-data[,c(x,y)]
-  s1<-s1[order(s1[,x]),]
+  s1<-data[,c(x.dat,y.dat)]
+  names(s1)<-c("xx","yy")
+  s1<-s1[order(s1$xx),]
 
   s1$hit<-hit
   s1$lowt<-lowt
 
-  s1$y<-s1[,y]
-  s1$x<-s1[,x]
+  #s1$yy<-s1[,y]
+  #s1$xx<-s1[,x]
   s1$f<-"dum"##s1[,facet]
 
-  s1$hi<-with(s1,ifelse(y>hit,1,0))
-  s1$wi<-with(s1,ifelse(y<=hit&y>=lowt,1,0))
-  s1$lo<-with(s1,ifelse(y<lowt,1,0))
+  s1$hi<-with(s1,ifelse(yy>hit,1,0))
+  s1$wi<-with(s1,ifelse(yy<=hit&yy>=lowt,1,0))
+  s1$lo<-with(s1,ifelse(yy<lowt,1,0))
 
-  nn<-addvar(s1,x,x,"length(x)","var","n")
+  nn<-addvar(s1,"xx","xx","length(x)","var","n")
   #s1<-join(s1,nn)
   str(s1)
 
-  targ<-addvar(s1,x,"hi","sum(x)","var","hi")
-  targ<-dplyr::left_join(targ,addvar(s1,x,"wi","sum(x)","var","wi"))
-  targ<-dplyr::left_join(targ,addvar(s1,x,"lo","sum(x)","var","lo"))
+  targ<-addvar(s1,"xx","hi","sum(x)","var","hi")
+  targ<-dplyr::left_join(targ,addvar(s1,"xx","wi","sum(x)","var","wi"))
+  targ<-dplyr::left_join(targ,addvar(s1,"xx","lo","sum(x)","var","lo"))
   targ<-dplyr::left_join(targ,nn);
   targ$hi<-with(targ,round(hi/n*100,1))
   targ$wi<-with(targ,round(wi/n*100,1))
@@ -493,69 +509,107 @@ lh_boxplot2<-function(data,y,x,x.title,y.title,target=c(1,5),add.obs.point="no",
   targ$lo<-with(targ,paste0(round(lo,0),"%"))
   targ$allt<-with(targ,paste(hi,wi,lo,sep="\n"))
 
-  lowtar<-nodup(s1,"f","add",c("lowt","hit","y"))
+  lowtar<-nodup(s1,"f","add",c("lowt","hit","yy"))
 
-  var<-y
-  coord<-addvar(s1,"f",var,"max(x)","add","max1")
+  #var<-y
+  coord<-addvar(s1,"f","yy","max(x)","add","max1")
   targ$f<-"dum"
   targ2<-dplyr::left_join(targ,coord)
+
+targ2<-targ2|>
+  mutate(max1=ifelse(!is.null(max.y),max.y,max1))
 
   targ2$ma1<-targ2$max1+(space[3]*targ2$max1)
   targ2$me1<-targ2$max1+(space[2]*targ2$max1)
   targ2$mi1<-targ2$max1+(space[1]*targ2$max1)
-  targ2$x<-targ2[,x]
+
+  #targ2$xx<-targ2[,x]
   #targ2$f<-targ2[,facet]
 
   targ2$mid<-as.numeric(gsub("%","",targ2$wi))
   targ2$upper<-as.numeric(gsub("%","",targ2$hi))
   targ2$lower<-as.numeric(gsub("%","",targ2$lo))
 
+
   if(!is.null(color.target.cuttoff)){
+    if(!is.null(targ.legend)){
+      lab0<-targ.legend[1]
+      lab1<-targ.legend[2]
+      lab2<-targ.legend[3]
+      lab3<-targ.legend[4]
+    }else{
     lab0<-paste0("Off target (<",color.target.cuttoff,"%)")
     lab1<-paste0("Low target \U2265",color.target.cuttoff,"%")
     lab2<-paste0("Mid target \U2265",color.target.cuttoff,"%")
-    lab3<-paste0("High target \U2265",color.target.cuttoff,"%")
+    lab3<-paste0("High target \U2265",color.target.cuttoff,"%")}
     targ2$type1<-lab0
     targ2$type1[targ2$mid>=color.target.cuttoff]<-lab2
     targ2$type1[targ2$upper>=color.target.cuttoff]<-lab3
     targ2$type1[targ2$lower>=color.target.cuttoff]<-lab1
 
     targ2$col<-"grey"
-    targ2$col[targ2$type1==lab2]<-"green"
-    targ2$col[targ2$type1==lab3]<-"red"
-    targ2$col[targ2$type1==lab1]<-"blue"
+    targ2$col[targ2$type1==lab2]<-targ.text.col[2]
+    targ2$col[targ2$type1==lab3]<-targ.text.col[3]
+    targ2$col[targ2$type1==lab1]<-targ.text.col[1]
 
 
     targ2<-lhfactor(targ2,"type1","col")
 
 
     s1<-s1%>%
-      left_join(targ2[,c("x","type1","col")])
+      left_join(targ2[,c("xx","type1","col")])
 
     #sort(as.factor(unique(s1$x)))
     #sort(as.factor(unique(s1$col)))
-    s1<-reflag(s1,"col",c("grey","blue","green","red"))
+
+    s1<-reflag(s1,"col",c("grey",targ.text.col))
     s1<-lhfactor(s1,"col","type1")
     col<-sort(as.factor(unique(s1$col)))
   }
 
+#CHANGE THE STATS OF BOXPLOT?
+theme_set(theme_bw())
 
-  if(!is.null(color.target.cuttoff)){
-    p0<-ggplot(s1,aes(x=x,y=y,fill=as.factor(type1)))
-  }else{p0<-ggplot(s1,aes(x=x,y=y))}
+if(!is.null(box.stats)){
+s2<-s1
+#s2$xx<-s2[,x]
+#s2$yy<-s2[,y]
+s2<-s2%>%
+  addvar("xx","yy",box.stats[1],"yes","y05")|>
+  addvar("xx","yy",box.stats[2],"yes","y25")|>
+  addvar("xx","yy",box.stats[3],"yes","y5")|>
+  addvar("xx","yy",box.stats[4],"yes","y75")|>
+  addvar("xx","yy",box.stats[5],"yes","y95")|>
+  mutate(outlow=ifelse(yy<y05,yy,NA),outhi=ifelse(yy>y95,yy,NA))
+s3<-s2%>%
+  distinct(xx,.keep_all = T)
+}
 
+
+max.y.all<-max(targ2$ma1)
+min.y.all<-max(targ2$mi1)
+
+if(!is.null(color.target.cuttoff)){
+  p0<-ggplot(s2,aes(x=xx,y=yy,fill=as.factor(type1)))+ylim(min.y,max.y.all)
+  }else{p0<-ggplot(s1,aes(x=xx,y=yy))+ylim(min.y,max.y.all)}
+
+if(!is.null(box.stats)){
+    p0<- p0+ geom_boxplot(data=s3,aes(ymin = y05, lower = y25, middle = y5, upper = y75, ymax =y95),stat = "identity", alpha =transparency)+xlab(xti)+ylab(yti)
+    if(outlier=="yes"){
+    p0<- p0+geom_point(aes(y=outlow))+geom_point(aes(y=outhi))}
+}else{
   if(outlier=="no"){
-    p0<- p0+ geom_boxplot(outlier.shape ="", alpha =transparency)+
-      xlab(xti)+ylab(yti)}else{
-        p0<- p0+ geom_boxplot(alpha =transparency)+
-          xlab(xti)+ylab(yti)
-      }
+  p0<-p0+geom_boxplot(outlier.shape ="", alpha =transparency)+
+    xlab(xti)+ylab(yti)
+  }else{
+    p0<-p0+geom_boxplot(alpha =transparency)+
+      xlab(xti)+ylab(yti)
+}}
 
-  if(obs=="yes"){
+
+if(obs=="yes"){
     p0<-p0+geom_jitter(width =jit[1], height =jit[2],col=obs.color,alpha=transparency,size=obs.size)
   }
-
-
   if(!is.null(target)){
     p0<-p0+ geom_hline(data=lowtar,aes(yintercept=lowt), linetype=target.line.type[1], color =targ.line.col[1],size=targ.line.size)+
       geom_hline(data=lowtar,aes(yintercept=hit), linetype=target.line.type[2], color =targ.line.col[2],size=targ.line.size)
@@ -564,20 +618,19 @@ lh_boxplot2<-function(data,y,x,x.title,y.title,target=c(1,5),add.obs.point="no",
     p0<-p0+scale_fill_manual(values=as.character(col))+guides(fill=guide_legend(title=legend.title))
 
   }
+
   if(prop=="yes"){
     if(hit==lowt){
-      p0<-p0+geom_text(data=targ2, aes(x=x, y=me1, label=lo), col=targ.line.col[1], size=targ.text.size)+
-        geom_text(data=targ2, aes(x=x, y=ma1, label=hi), col=targ.line.col[2], size=targ.text.size)
+      p0<-p0+geom_text(data=targ2, aes(x=xx, y=me1, label=lo), col=targ.text.col[1], size=targ.text.size)+
+      geom_text(data=targ2, aes(x=xx, y=ma1, label=hi), col=targ.text.col[2], size=targ.text.size)
     }else{
-      p0<-p0+geom_text(data=targ2, aes(x=x, y=mi1,label=lo), col=targ.text.col[1], size=targ.text.size)+
-        geom_text(data=targ2, aes(x=x, y=me1, label=wi), col=targ.text.col[2], size=targ.text.size)+
-        geom_text(data=targ2, aes(x=x, y=ma1, label=hi), col=targ.text.col[3], size=targ.text.size)
-      # +
-      #annotate("rect", xmin=hitar$x[1], xmax=hitar$x[2], ymin=lowtar$y[1], ymax=hitar$y[2], alpha=0.2, fill="red")
+      p0<-p0+geom_text(data=targ2, aes(x=xx, y=mi1,label=lo), col=targ.text.col[1], size=targ.text.size)+
+        geom_text(data=targ2, aes(x=xx, y=me1, label=wi), col=targ.text.col[2], size=targ.text.size)+
+        geom_text(data=targ2, aes(x=xx, y=ma1, label=hi), col=targ.text.col[3], size=targ.text.size)
     }
-    p0<-p0+theme_bw()
   }
-  p0
+
+p0+coord_cartesian(ylim = c(NA,max.y.all), clip = 'off')+scale_y_continuous(breaks=seq(min.y,max.y,increm.y),label=seq(min.y,max.y,increm.y))
 
 }
 
