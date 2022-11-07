@@ -2,7 +2,7 @@
 #' Tips for plot
 #'
 #' tips for plot
-#' @keywords
+#' @keywords tips.plot
 #' @export
 #' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
 #' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
@@ -21,7 +21,7 @@ tips.plot<-function(...){
 #' @param catcov list categorical covariates.
 #' @param stats define statistics for mid, lower and upper.
 #' @param N number of subjects to be included
-#' @keywords
+#' @keywords forest.dat
 #' @export
 #' @examples dat<-forest.dat(data=t,parameter=c("Cmax..ng.mL.","AUCtau..ng.h.mL."),catcov=c("Cohort","WT_group"),stats=c("quantile(x,0.5)=mid","quantile(x,0.05)=lower","quantile(x,0.95)=upper","length(x)=n"))
 #' @examples Save dataset as CSV then open shiny APP using coveffectsplot::run_interactiveforestplot(). The package could be installed from Github: devtools::install_github('smouksassi/coveffectsplot')
@@ -119,7 +119,7 @@ lh_catcon_cov<-function (data, lst.eta = c("contcov"),con.cov.group="demo", lst.
 #' @param obs.data Obs dataset resulted from vpc function in tidyvp.Set it to null to omit the observed data
 #' @param x.lab X axis label in characters, mandatory
 #' @param box.width Width parameter for PI shaded area
-#' @keywords
+#' @keywords vpc_cat
 #' @export
 #' @examples vpc <- observed(obs, x=NTIMEN, y=DV) %>%
 #' @examples simulated (sim, y=DV)%>%
@@ -127,7 +127,7 @@ lh_catcon_cov<-function (data, lst.eta = c("contcov"),con.cov.group="demo", lst.
 #' @examples binning(bin =NTIMEN)%>%
 #' @examples p<-vpcstats() + other ggplot functions such as facet_wrap/grid, etc.
 #'@examples vpc_cat(...)
-#'
+
 
 vpc_cat<-function (sim.data = vpc$stats, obs.data = vpc$obs,
                    obs.var = c("x","y"),
@@ -205,7 +205,7 @@ vpc_cat<-function (sim.data = vpc$stats, obs.data = vpc$obs,
 #' @keywords lh_cwres
 #' @export
 #' @examples lh_cwres(...)
-#'
+
 lh_cwres<-function(data,y="CWRES",
                    x="TAD",type="log",scale=c(0.1,100),
                    xtit="Individual Predicted Concentration (ng/mL)",
@@ -270,7 +270,7 @@ lh_cwres<-function(data,y="CWRES",
 #' @examples lh_dv(...)
 #' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
 #' @example  Greek unicode slash and U03B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
-#'
+
 lh_dv<-function(data,y="DV",
                 x="IPRED",type="log",scale="auto",
                 xtit="Individual Predicted Concentration (ng/mL)",
@@ -374,7 +374,7 @@ ggplot(data,aes(x,y,label=id))+
 #' @examples lh_cwres_strat(...)
 #' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
 #' @example  Greek unicode slash and U03B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
-#'
+
 lh_cwres_strat<-function(data,x,y,id,xlab="Population Predictions (\U03BCg/mL)",ylab="Conditional Weighted Residual",by="Age_Group"){
   data$x<-data[,x]
   data$y<-data[,y]
@@ -422,6 +422,7 @@ ggplot(data,aes(x,y,label=id))+
 #' @param color.target.cutoff specify the cutoff value for color box. Use numeric value of stats function.
 #' @param targ.legend change legend description of each box color
 #' @keywords lh_boxplot2
+#' @export
 #' @examples lh_boxplot2(data=rall,
 #' @examples y.dat="Cmaxss",
 #' @examples x.dat="Label",
@@ -436,7 +437,7 @@ ggplot(data,aes(x,y,label=id))+
 #' @examples add.stats="yes",
 #' @examples stat.label.space=c(0.1,0.2),jit=c(0.15,0)) +theme_bw()+ theme(axis.text.x #'
 #' @examples = element_text(angle = 45, hjust = 1))+scale_y_log10()
-#' @export
+
 
 lh_boxplot2<-function(data=NULL,
                       y.dat=NULL,
@@ -1193,7 +1194,7 @@ lh_cat_cov<-function(data,lst.eta=c("ETA1"),lst.cov=c("SEX","RACE"),save.path=NU
 #' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 
 lh_eta_dist<-function (data=eta1, lst.eta =c("Ka","F","Vc"), ncol = 3, nrow = 2, fancy = "yes")
-{
+  {
   if (!is.null(fancy)) {
     xname <- gsub("ETA", "", toupper(lst.eta))
     xname <- paste0("\U03B7", xname)
@@ -1368,7 +1369,7 @@ lh_indiv_plot<-function (data, id = "usubjid", n.plots.page = 9, time = "time",
 #' @export
 #' @examples lh_explor_ind(data=dat1,id="usubjid",n.plots.page=9,time="time",dv="dv",ipred="ipred"#' #' @examples ,pred="pred",type="linear",
 #' @examples xtit="Time after first dose (h)",
-#' @examplesytit="Concentration (ng/mL)",output.name="Individiual.docx")
+#' @example  sytit="Concentration (ng/mL)",output.name="Individiual.docx")
 #' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
 #' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 

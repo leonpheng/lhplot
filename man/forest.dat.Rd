@@ -31,3 +31,4 @@ Generate dataset for coveffectsplot
 dat<-forest.dat(data=t,parameter=c("Cmax..ng.mL.","AUCtau..ng.h.mL."),catcov=c("Cohort","WT_group"),stats=c("quantile(x,0.5)=mid","quantile(x,0.05)=lower","quantile(x,0.95)=upper","length(x)=n"))
 Save dataset as CSV then open shiny APP using coveffectsplot::run_interactiveforestplot(). The package could be installed from Github: devtools::install_github('smouksassi/coveffectsplot')
 }
+\keyword{forest.dat}

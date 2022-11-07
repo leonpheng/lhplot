@@ -9,3 +9,4 @@ tips.plot(...)
 \description{
 tips for plot
 }
+\keyword{tips.plot}
