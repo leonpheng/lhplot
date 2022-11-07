@@ -9,35 +9,59 @@ lh_boxplot2(
   y.dat = NULL,
   x.dat = NULL,
   x.title = NULL,
-  y.title,
-  target = c(1, 5),
+  target = NULL,
   add.obs.point = "no",
   add.stats = "no",
   stat.label.space = c(0.1, 0.2),
   max.y = NULL,
-  min.y = 0,
+  min.y = NULL,
   increm.y = 100,
   box.stats = c("quantile(x,0.05)", "quantile(x,0.25)", "quantile(x,0.5)",
     "quantile(x,0.75)", "quantile(x,0.95)"),
+  box.target = NULL,
   jit = c(0.1, 0.1),
   targ.line.size = 1,
   targ.text.size = 3,
   targ.text.col = c("blue", "green4", "red"),
   targ.line.col = c("blue", "red"),
-  color.target.cuttoff = 80,
+  color.target.cutoff = "median(x)",
   outlier = "no",
   transparency = 0.5,
   obs.color = "grey",
   obs.size = 1,
-  target.line.type = c("solid", "dashed"),
+  target.line.type = NULL,
   legend.title = "Target Attainment",
-  targ.legend = c("missed", "below adult geomeans at 400 mg BID",
-    "between adult geomeans at 400 & 1200 mg BID",
-    "Simulated median above adult geomean at 1200 mg BID")
+  targ.legend = c("below lower", "within lower and upper", "above upper")
 )
 }
 \arguments{
 \item{data}{data frame}
+
+\item{y.dat}{y and x (x.dat) data}
+
+\item{target}{set target values. Two values are required, use the same value for single target cutoff.}
+
+\item{add.obs.point}{set Yes to display observed data}
+
+\item{add.stats}{set to yes for displaying percentage of individual who attained each target}
+
+\item{stat.label.space}{adjust spacing between each stats in the figure}
+
+\item{max.y}{set maximum value of y axis. Use this parameter for setting the lower boundary of the stats values in the figure}
+
+\item{min.y}{set minimum value of y axis}
+
+\item{increm.y}{set y axis ticks}
+
+\item{box.stats}{specify the function for lower whisker, min, mid, max box, and upper whisker value. NUll for standard values (med-1.5IQR,25th,50th,75th,med+1.5*IQ)}
+
+\item{box.target}{NULL to use keep the same target as in target parameter.}
+
+\item{targ.line.size}{adjust stats text to display on top (also, targ.text.size, targ.text.col,targ.line.col)}
+
+\item{color.target.cutoff}{specify the cutoff value for color box. Use numeric value (ex: 20 for 20%). By default the box is colored with blue, green, red colors for median <low target,low target >= median<up target, median>=up target.}
+
+\item{targ.legend}{change the legend description for each box color}
 }
 \description{
 Generate boxplot with targets and stats

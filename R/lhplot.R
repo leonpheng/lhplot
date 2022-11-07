@@ -408,6 +408,19 @@ ggplot(data,aes(x,y,label=id))+
 #'
 #' Generate boxplot with targets and stats
 #' @param data data frame
+#' @param y.dat y and x (x.dat) data
+#' @param target set target values. Two values are required, use the same value for single target cutoff.
+#' @param add.obs.point  set Yes to display observed data
+#' @param add.stats set to yes for displaying percentage of individual who attained each target
+#' @param stat.label.space adjust spacing between each stats in the figure
+#' @param max.y set maximum value of y axis. Use this parameter for setting the lower boundary of the stats values in the figure
+#' @param min.y set minimum value of y axis
+#' @param increm.y set y axis ticks
+#' @param box.stats specify the function for lower whisker, min, mid, max box, and upper whisker value. NUll for standard values (med-1.5IQR,25th,50th,75th,med+1.5*IQ)
+#' @param box.target NULL to use keep the same target as in target parameter.
+#' @param targ.line.size  adjust stats text to display on top (also, targ.text.size, targ.text.col,targ.line.col)
+#' @param color.target.cutoff specify the cutoff value for color box. Use numeric value (ex: 20 for 20%). By default the box is colored with blue, green, red colors for median <low target,low target >= median<up target, median>=up target.
+#' @param targ.legend change the legend description for each box color
 #' @keywords lh_boxplot2
 #' @export
 #' @examples lh_boxplot2(data=rall,
@@ -428,28 +441,29 @@ lh_boxplot2<-function(data=NULL,
                       y.dat=NULL,
                       x.dat=NULL,
                       x.title=NULL,
-                      y.title,target=c(1,5),
+                      target=NULL,
                       add.obs.point="no",
                       add.stats="no",
                       stat.label.space=c(0.1,0.2),
                       max.y=NULL,
-                      min.y=0,
+                      min.y=NULL,
                       increm.y=100,
                       box.stats=c("quantile(x,0.05)","quantile(x,0.25)","quantile(x,0.5)","quantile(x,0.75)","quantile(x,0.95)"),
+                      box.target=NULL,
                       jit=c(0.1,0.1),
                       targ.line.size=1,
                       targ.text.size=3,
                       targ.text.col=c('blue','green4','red'),
                       targ.line.col=c('blue',"red"),
-                      color.target.cuttoff=80,
+                      color.target.cutoff="median(x)",
                       outlier="no",
                       transparency=0.5,
                       obs.color="grey",
                       obs.size=1,
-                      target.line.type=c("solid","dashed"),
+                      target.line.type=NULL,
                       legend.title="Target Attainment",
-                      targ.legend=c("missed","below adult geomeans at 400 mg BID",
-                      "between adult geomeans at 400 & 1200 mg BID","Simulated median above adult geomean at 1200 mg BID"))
+                      targ.legend=c("below lower",
+                      "within lower and upper","above upper"))
 {
   #Compute target attainment
   library(ggplot2)
@@ -531,32 +545,54 @@ targ2<-targ2|>
   targ2$lower<-as.numeric(gsub("%","",targ2$lo))
 
 
-  if(!is.null(color.target.cuttoff)){
+  if(!is.null(color.target.cutoff)){
     if(!is.null(targ.legend)){
-      lab0<-targ.legend[1]
-      lab1<-targ.legend[2]
-      lab2<-targ.legend[3]
-      lab3<-targ.legend[4]
+      lab0<-"NA"
+      lab1<-targ.legend[1]
+      lab2<-targ.legend[2]
+      lab3<-targ.legend[3]
     }else{
-    lab0<-paste0("Off target (<",color.target.cuttoff,"%)")
-    lab1<-paste0("Low target \U2265",color.target.cuttoff,"%")
-    lab2<-paste0("Mid target \U2265",color.target.cuttoff,"%")
-    lab3<-paste0("High target \U2265",color.target.cuttoff,"%")}
+    lab0<-paste0("Off target (<",color.target.cutoff,"%)")
+    lab1<-paste0("Low target \U2265",color.target.cutoff,"%")
+    lab2<-paste0("Mid target \U2265",color.target.cutoff,"%")
+    lab3<-paste0("High target \U2265",color.target.cutoff,"%")}
+
+    #color.target.cuttoff=50
+    #color.target.cuttoff="median(x)"
+    if(is.null(box.target)){
+      box.target<-target
+    }
+
+    if(is.numeric(color.target.cutoff)){
     targ2$type1<-lab0
-    targ2$type1[targ2$mid>=color.target.cuttoff]<-lab2
-    targ2$type1[targ2$upper>=color.target.cuttoff]<-lab3
-    targ2$type1[targ2$lower>=color.target.cuttoff]<-lab1
+    targ2$type1[targ2$mid>=color.target.cutoff]<-lab2
+    targ2$type1[targ2$upper>=color.target.cutoff]<-lab3
+    targ2$type1[targ2$lower>=color.target.cutoff]<-lab1
+    }else{
+    targ0<-addvar(s1,"xx","yy",color.target.cutoff,"var","targ0")
+    if(length(box.target)==2){
+    targ2<-targ2|>
+      left_join(targ0)|>
+      mutate(type1=ifelse(targ0>=box.target[1]&targ0<box.target[2],lab2,
+                          ifelse(targ0>=box.target[2],lab3,
+                                 ifelse(targ0<box.target[1],lab1,lab0))))
+    }else{
+      targ2<-targ2|>
+        left_join(targ0)|>
+        mutate(type1=ifelse(targ0>=box.target[1],lab2,
+                            lab1))
+    }}
 
     targ2$col<-"grey"
     targ2$col[targ2$type1==lab2]<-targ.text.col[2]
     targ2$col[targ2$type1==lab3]<-targ.text.col[3]
     targ2$col[targ2$type1==lab1]<-targ.text.col[1]
 
-
     targ2<-lhfactor(targ2,"type1","col")
 
+    #nodup(targ2,c("type1","col"),"var")
 
-    s1<-s1%>%
+      s1<-s1%>%
       left_join(targ2[,c("xx","type1","col")])
 
     #sort(as.factor(unique(s1$x)))
@@ -589,7 +625,7 @@ s3<-s2%>%
 max.y.all<-max(targ2$ma1)
 min.y.all<-max(targ2$mi1)
 
-if(!is.null(color.target.cuttoff)){
+if(!is.null(color.target.cutoff)){
   p0<-ggplot(s2,aes(x=xx,y=yy,fill=as.factor(type1)))+ylim(min.y,max.y.all)
   }else{p0<-ggplot(s1,aes(x=xx,y=yy))+ylim(min.y,max.y.all)}
 
@@ -610,16 +646,17 @@ if(!is.null(box.stats)){
 if(obs=="yes"){
     p0<-p0+geom_jitter(width =jit[1], height =jit[2],col=obs.color,alpha=transparency,size=obs.size)
   }
-  if(!is.null(target)){
+
+if(!is.null(target.line.type)){
     p0<-p0+ geom_hline(data=lowtar,aes(yintercept=lowt), linetype=target.line.type[1], color =targ.line.col[1],size=targ.line.size)+
       geom_hline(data=lowtar,aes(yintercept=hit), linetype=target.line.type[2], color =targ.line.col[2],size=targ.line.size)
   }
-  if(!is.null(color.target.cuttoff)){
-    p0<-p0+scale_fill_manual(values=as.character(col))+guides(fill=guide_legend(title=legend.title))
 
+if(!is.null(color.target.cutoff)){
+    p0<-p0+scale_fill_manual(values=as.character(col))+guides(fill=guide_legend(title=legend.title))
   }
 
-  if(prop=="yes"){
+if(prop=="yes"){
     if(hit==lowt){
       p0<-p0+geom_text(data=targ2, aes(x=xx, y=me1, label=lo), col=targ.text.col[1], size=targ.text.size)+
       geom_text(data=targ2, aes(x=xx, y=ma1, label=hi), col=targ.text.col[2], size=targ.text.size)
@@ -629,7 +666,6 @@ if(obs=="yes"){
         geom_text(data=targ2, aes(x=xx, y=ma1, label=hi), col=targ.text.col[3], size=targ.text.size)
     }
   }
-
 p0+coord_cartesian(ylim = c(NA,max.y.all), clip = 'off')+scale_y_continuous(breaks=seq(min.y,max.y,increm.y),label=seq(min.y,max.y,increm.y))
 
 }
