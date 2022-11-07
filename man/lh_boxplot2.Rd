@@ -59,9 +59,9 @@ lh_boxplot2(
 
 \item{targ.line.size}{adjust stats text to display on top (also, targ.text.size, targ.text.col,targ.line.col)}
 
-\item{color.target.cutoff}{specify the cutoff value for color box. Use numeric value (ex: 20 for 20%). By default the box is colored with blue, green, red colors for median <low target,low target >= median<up target, median>=up target.}
+\item{color.target.cutoff}{specify the cutoff value for color box. Use numeric value of stats function.}
 
-\item{targ.legend}{change the legend description for each box color}
+\item{targ.legend}{change legend description of each box color}
 }
 \description{
 Generate boxplot with targets and stats
@@ -77,6 +77,7 @@ high.targ.line=rf$Cmaxsshi,
 add.target="yes",
 add.obs.point="yes", tips: GE>= (\+U2265), LE<= (\+U2264)
 add.stats="yes",
-stat.label.space=c(0.1,0.2),jit=c(0.15,0)) +theme_bw()+ theme(axis.text.x #' @examples = element_text(angle = 45, hjust = 1))+scale_y_log10()
+stat.label.space=c(0.1,0.2),jit=c(0.15,0)) +theme_bw()+ theme(axis.text.x #'
+= element_text(angle = 45, hjust = 1))+scale_y_log10()
 }
 \keyword{lh_boxplot2}

@@ -419,10 +419,9 @@ ggplot(data,aes(x,y,label=id))+
 #' @param box.stats specify the function for lower whisker, min, mid, max box, and upper whisker value. NUll for standard values (med-1.5IQR,25th,50th,75th,med+1.5*IQ)
 #' @param box.target NULL to use keep the same target as in target parameter.
 #' @param targ.line.size  adjust stats text to display on top (also, targ.text.size, targ.text.col,targ.line.col)
-#' @param color.target.cutoff specify the cutoff value for color box. Use numeric value (ex: 20 for 20%). By default the box is colored with blue, green, red colors for median <low target,low target >= median<up target, median>=up target.
-#' @param targ.legend change the legend description for each box color
+#' @param color.target.cutoff specify the cutoff value for color box. Use numeric value of stats function.
+#' @param targ.legend change legend description of each box color
 #' @keywords lh_boxplot2
-#' @export
 #' @examples lh_boxplot2(data=rall,
 #' @examples y.dat="Cmaxss",
 #' @examples x.dat="Label",
@@ -435,7 +434,9 @@ ggplot(data,aes(x,y,label=id))+
 #' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 #' @examples add.obs.point="yes", tips: GE>= (\+U2265), LE<= (\+U2264)
 #' @examples add.stats="yes",
-#' @examples stat.label.space=c(0.1,0.2),jit=c(0.15,0)) +theme_bw()+ theme(axis.text.x #' @examples = element_text(angle = 45, hjust = 1))+scale_y_log10()
+#' @examples stat.label.space=c(0.1,0.2),jit=c(0.15,0)) +theme_bw()+ theme(axis.text.x #'
+#' @examples = element_text(angle = 45, hjust = 1))+scale_y_log10()
+#' @export
 
 lh_boxplot2<-function(data=NULL,
                       y.dat=NULL,
