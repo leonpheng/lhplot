@@ -9,6 +9,7 @@ lh_boxplot2(
   y.dat = NULL,
   x.dat = NULL,
   x.title = NULL,
+  y.title = NULL,
   target = NULL,
   add.obs.point = "no",
   add.stats = "no",
