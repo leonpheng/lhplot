@@ -1292,6 +1292,7 @@ dev.off()}
 #' @examplesytit="Concentration (ng/mL)",output.name="Individiual.docx")
 #' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
 #' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
+
 lh_indiv_plot<-function (data=res1, id = "NMID", n.plots.page = 9, time = "TAD",
                          dv = "DV", ipred = "IPRED", pred = "PRED",
                          smooth = "no", type = "linear", xtit = "Time after first dose (h)",
@@ -1432,14 +1433,18 @@ p<-ggplot2::ggplot(ddat[is.na(ddat$amt),],aes_string(x=time,y=dv))+
 #' @param data Data frame, merged ETA and COVAR data
 #' @param lst.eta List of ETA names
 #' @param lst.cov List of covariate names. Add plot name to save.path
+#' @param diag.fs diagonal label font size
+#' @param stat.fs stats info font size
+#' @param p.width plot width and p.height
+#' @param p.pointsize plot point size and scat.pch
 #' @keywords lh_con_cov
 #' @export
-#' @examples p1<-lh_con_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
+#' @examples
 #' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
 #' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 
-lh_con_cov<-function (data, lst.eta = c("eta1", "eta2"), lst.cov = c("AGE",
-                                                                     "WT"), save.path = "./scatter.png", fancy = "yes",diag.fs=12,stat.fz=12,p.width = 768, p.height = 768, p.pointsize = 16,scat.pch=20)
+lh_con_cov<-function (data, lst.eta = c("eta1", "eta2"), lst.cov = c("AGE", "WT"),
+                      save.path = "./scatter.png", fancy = "yes",diag.fs=12,stat.fs=12,p.width = 768, p.height = 768, p.pointsize = 16,scat.pch=20)
 {
   library(lattice)
   library(grid)
@@ -1453,9 +1458,9 @@ lh_con_cov<-function (data, lst.eta = c("eta1", "eta2"), lst.cov = c("AGE",
   }
   png(save.path, width = p.width, height = p.height, pointsize = p.pointsize)
   print(gpairs(x = data[, c(lst.eta, lst.cov)], upper.pars = list(conditional = "boxplot",
-                                                                  scatter = "loess"), lower.pars = list(scatter = "stats",
-                                                                                                        conditional = "barcode"), diag.pars = list(fontsize = diag.fs,
-                                                                                                                                                   show.hist = TRUE, hist.color = "gray"), stat.pars = list(fontsize = stat.fz,
+       scatter = "loess"), lower.pars = list(scatter = "stats",
+             conditional = "barcode"), diag.pars = list(fontsize = diag.fs,
+                  show.hist = TRUE, hist.color = "gray"), stat.pars = list(fontsize = stat.fs,
                                                                                                                                                                                                             signif = F, verbose = T, use.color = TRUE, missing = "missing",
                                                                                                                                                                                                             just = "centre"), scatter.pars = list(pch =scat.pch)))
   dev.off()

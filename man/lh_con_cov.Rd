@@ -11,7 +11,7 @@ lh_con_cov(
   save.path = "./scatter.png",
   fancy = "yes",
   diag.fs = 12,
-  stat.fz = 12,
+  stat.fs = 12,
   p.width = 768,
   p.height = 768,
   p.pointsize = 16,
@@ -24,11 +24,16 @@ lh_con_cov(
 \item{lst.eta}{List of ETA names}
 
 \item{lst.cov}{List of covariate names. Add plot name to save.path}
+
+\item{diag.fs}{diagonal label font size}
+
+\item{stat.fs}{stats info font size}
+
+\item{p.width}{plot width and p.height}
+
+\item{p.pointsize}{plot point size and scat.pch}
 }
 \description{
 Generate COVAR
-}
-\examples{
-p1<-lh_con_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
 }
 \keyword{lh_con_cov}
