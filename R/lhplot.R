@@ -1292,75 +1292,80 @@ dev.off()}
 #' @examplesytit="Concentration (ng/mL)",output.name="Individiual.docx")
 #' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
 #' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
-
-lh_indiv_plot<-function (data, id = "usubjid", n.plots.page = 9, time = "time",
-                         dv = "dv", ipred = "ipred", pred = "pred",smooth="no",
-                         type = "linear", xtit = "Time after first dose (h)",
-                         ytit = "Concentration (ng/mL)", output.name = "./ind.plots/individual_plots.docx")
-{
+lh_indiv_plot<-function (data=res1, id = "NMID", n.plots.page = 9, time = "TAD",
+                         dv = "DV", ipred = "IPRED", pred = "PRED",
+                         smooth = "no", type = "linear", xtit = "Time after first dose (h)",
+                         ytit = "Concentration (ng/mL)",out.path="./V1/ind.plots",
+                         break2=c(1e-04, 5e-04, 0.001, 0.005, 0.1, 0.5, 1,
+                                  5, 10, 100, 10^3, 10^4, 10^5, 10^6),p.dpi=300,p.width=6,p.height=6){
   library(scales)
   library(ggplot2)
-  dir.create("./ind.plots")
+  dir.create(out.path)
   npepage <- n.plots.page
   n <- length(unique(data[, id]))
-  page <- 1:ceiling(n/npepage)
-  nb_pg2 <- page * n
-  nb_pg1 <- c(1, nb_pg2[1:(length(nb_pg2) - 1)] + 1)
-  doc <- officer::read_docx()
-  for (i in 1:length(nb_pg2)) {
-    ddat <- data[data[, id] %in% unique(data[, id])[nb_pg1[i]:nb_pg2[i]],
-    ]
-    ddat$usubjid <- ddat[, id]
-    break2 <- c(1e-04, 5e-04, 0.001, 0.005, 0.1, 0.5, 1,
-                5, 10, 100, 10^3, 10^4, 10^5, 10^6)
-    ddat$TIME<-ddat[,time]
-    ddat$DV<-ddat[,dv]
-    p <- ggplot(ddat, aes(x =TIME, y = DV)) +
-      geom_point(aes(col = "Observed"))
+  totpage<-ceiling(n/npepage)
+  uid<-unique(unique(data[, id]))
 
+  data$dum <-as.character(data[,id])
+  dat<-data|>
+    select(dum)|>
+    distinct(dum)
+  dat2<-data.frame(keep=rep(1:npepage,each=npepage))
+  dat<-lhcbind(dat,dat2$keep)|>
+    filter(dum!="")
+  data<-data|>
+    dplyr::left_join(dat)
+
+  for (i in 1:totpage){
+    ddat <- data[data$dat2%in%i,]
+    ddat$usubjid <- ddat[, id]
+    ddat$TIME <- ddat[, time]
+    ddat$DV <- ddat[, dv]
+    p <- ggplot(ddat, aes(x = TIME, y = DV)) + geom_point(aes(col = "Observed"))
     if (!is.null(ipred)) {
-      ddat$IPRED<-ddat[,ipred]
-      p <- p + geom_line(aes(y =IPRED, col = "IPRED"))
+      ddat$IPRED <- ddat[, ipred]
+      p <- p + geom_line(aes(y = IPRED, col = "IPRED"))
     }
     if (!is.null(pred)) {
-      ddat$PRED<-ddat[,pred]
+      ddat$PRED <- ddat[, pred]
       p <- p + geom_line(aes(y = PRED, col = "PRED"))
     }
-
     p <- p + ggplot2::facet_wrap(~usubjid, scales = "free")
-
     if (type == "log") {
-    p = p + ggplot2::scale_y_log10(breaks = break2)
+      p = p + ggplot2::scale_y_log10(breaks = break2)
     }
-
     if (type == "both") {
       p1 = p + ggplot2::scale_y_log10(breaks = break2)
       p1 = p1 + ggplot2::scale_x_continuous() + ggplot2::xlab(xtit) +
         ggplot2::ylab(ytit) + ggplot2::theme_bw() + ggplot2::theme(legend.title = element_blank())
     }
-
     p = p + ggplot2::scale_x_continuous() + ggplot2::xlab(xtit) +
       ggplot2::ylab(ytit) + ggplot2::theme_bw() + ggplot2::theme(legend.title = element_blank())
-
-    if(type !="both"){
-    nm<-paste0("./ind.plots/page_",i,"_",type,".png")
-    ggsave(nm,p)}
-
-    if (type == "both"){
-    nm<-paste0("./ind.plots/page_",i,"_lin",".png")
-    ggsave(nm,p)
-    nm<-paste0("./ind.plots/page_",i,"_log",".png")
-    ggsave(nm,p1)
+    if (type != "both") {
+      nm <- paste0(output.name,"/page_", i, "_",
+                   type, ".png")
+      ggsave(nm, p,dpi=p.dpi,width = p.width,height = p.height)
     }
-  doc <- officer::body_add_gg(doc, p, width = 7.08, height = 5.9)
-    if (type == "both"){
-      doc <- officer::body_add_gg(doc, p1, width = 7.08, height = 5.9)}
-
-  if (!is.null(output.name)) {
-    print(doc, output.name)
-  }
+    if (type == "both") {
+      nm <- paste0(out.path,"/page_", i, "_lin",
+                   ".png")
+      ggsave(nm, p,dpi=p.dpi,width = p.width,height = p.height)
+      nm <- paste0(out.path,"/page_", i, "_log",
+                   ".png")
+      ggsave(nm, p1,dpi=p.dpi,width = p.width,height = p.height)
+    }
+    # doc <- officer::body_add_gg(doc, p, width = 7.08, height = 5.9)
+    # if (type == "both") {
+    #   doc <- officer::body_add_gg(doc, p1, width = 7.08,
+    #                               height = 5.9)
+    # }
+    # if (!is.null(output.name)) {
+    #   print(doc, output.name)
+    # }
   }
 }
+
+
 #' EXPLORATORY Individual plots
 #'
 #' Generate DATA
@@ -1433,25 +1438,28 @@ p<-ggplot2::ggplot(ddat[is.na(ddat$amt),],aes_string(x=time,y=dv))+
 #' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
 #' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 
-lh_con_cov<-function(data,lst.eta=c("eta1","eta2"),lst.cov=c("AGE","WT"),save.path="./scatter.png",fancy="yes"){
+lh_con_cov<-function (data, lst.eta = c("eta1", "eta2"), lst.cov = c("AGE",
+                                                                     "WT"), save.path = "./scatter.png", fancy = "yes",diag.fs=12,stat.fz=12,p.width = 768, p.height = 768, p.pointsize = 16,scat.pch=20)
+{
   library(lattice)
   library(grid)
-  if(!is.null(fancy)){
-    names(data)[names(data)%in%lst.eta]<-gsub("ETA","",names(data)[names(data)%in%lst.eta])
-    lst.eta<-gsub("ETA","",lst.eta)
-    names(data)[names(data)%in%lst.eta]<-paste0("\U03B7",names(data)[names(data)%in%lst.eta])
-    lst.eta<-paste0("\U03B7",lst.eta)
+  if (!is.null(fancy)) {
+    names(data)[names(data) %in% lst.eta] <- gsub("ETA",
+                                                  "", names(data)[names(data) %in% lst.eta])
+    lst.eta <- gsub("ETA", "", lst.eta)
+    names(data)[names(data) %in% lst.eta] <- paste0("??",
+                                                    names(data)[names(data) %in% lst.eta])
+    lst.eta <- paste0("??", lst.eta)
   }
-
-  png(save.path,width=768,height=768,pointsize = 16)
-  print(gpairs(x=data[,c(lst.eta,lst.cov)],
-               upper.pars = list(conditional = 'boxplot', scatter = 'loess'),
-               lower.pars = list(scatter = 'stats',conditional = "barcode"),
-               diag.pars = list(fontsize = 9, show.hist = TRUE, hist.color = "gray"),
-               stat.pars =list(fontsize = 11, signif =F, verbose =T, use.color = TRUE, missing = 'missing', just = 'centre'),
-               scatter.pars = list(pch = 20)))
-  dev.off()}
-
+  png(save.path, width = p.width, height = p.height, pointsize = p.pointsize)
+  print(gpairs(x = data[, c(lst.eta, lst.cov)], upper.pars = list(conditional = "boxplot",
+                                                                  scatter = "loess"), lower.pars = list(scatter = "stats",
+                                                                                                        conditional = "barcode"), diag.pars = list(fontsize = diag.fs,
+                                                                                                                                                   show.hist = TRUE, hist.color = "gray"), stat.pars = list(fontsize = stat.fz,
+                                                                                                                                                                                                            signif = F, verbose = T, use.color = TRUE, missing = "missing",
+                                                                                                                                                                                                            just = "centre"), scatter.pars = list(pch =scat.pch)))
+  dev.off()
+}
 
 
 ##########################################################################################################################

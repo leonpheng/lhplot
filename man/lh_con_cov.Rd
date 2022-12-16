@@ -9,7 +9,13 @@ lh_con_cov(
   lst.eta = c("eta1", "eta2"),
   lst.cov = c("AGE", "WT"),
   save.path = "./scatter.png",
-  fancy = "yes"
+  fancy = "yes",
+  diag.fs = 12,
+  stat.fz = 12,
+  p.width = 768,
+  p.height = 768,
+  p.pointsize = 16,
+  scat.pch = 20
 )
 }
 \arguments{

@@ -5,18 +5,23 @@
 \title{Individual plots}
 \usage{
 lh_indiv_plot(
-  data,
-  id = "usubjid",
+  data = res1,
+  id = "NMID",
   n.plots.page = 9,
-  time = "time",
-  dv = "dv",
-  ipred = "ipred",
-  pred = "pred",
+  time = "TAD",
+  dv = "DV",
+  ipred = "IPRED",
+  pred = "PRED",
   smooth = "no",
   type = "linear",
   xtit = "Time after first dose (h)",
   ytit = "Concentration (ng/mL)",
-  output.name = "./ind.plots/individual_plots.docx"
+  out.path = "./V1/ind.plots",
+  break2 = c(1e-04, 5e-04, 0.001, 0.005, 0.1, 0.5, 1, 5, 10, 100, 10^3, 10^4, 10^5,
+    10^6),
+  p.dpi = 300,
+  p.width = 6,
+  p.height = 6
 )
 }
 \arguments{
