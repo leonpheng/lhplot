@@ -2,6 +2,7 @@
 
 S3method(hist,cwres)
 export(forest.dat)
+export(forest.dat2)
 export(gpairs)
 export(lh_boxplot2)
 export(lh_cat_cov)

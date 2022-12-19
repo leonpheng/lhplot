@@ -12,7 +12,50 @@ tips.plot<-function(...){
         "Greek unicode slash and U03 then B1=alpha, B2=beta,B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda,BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega"))
 )}
 
-####BOXPLOT
+
+
+#' Prepare dataset for Forest plot data for Forestplot package
+#'
+#' Generate dataset for coveffectsplot
+#' @param data data frame (prepare categorical covariates before hand)
+#' @param param list of parameters
+#' @param label label rename
+#' @param covar define statistics for mid, lower and upper.
+#' @param categ redefine and order categories. Note that the first category will be used as reference
+#' @keywords forest.dat2
+#' @export
+
+
+
+forest.dat2<-function(data=data,param=c("auclast","cmax","clast.obs"),
+                      label,
+                      covar=c("hs","sexn"),
+                      categ=list(c("1=HV","2=CMV"),c("0=Male","1=Female"))){
+
+  responder1<-NULL
+  for(j in 1:length(covar)){
+    d1<-reflag(data[data[,covar[j]]%in%sub("=.*", "",categ[[j]]),],covar[j],sub("=.*", "",categ[[j]]),sub("*.=", "",categ[[j]]))
+    lab<-unique(paste0(sub("*.=", "",categ[[j]])[2]," vs ",sub("*.=", "",categ[[j]])[1]))
+    ref=sub("*.=", "",categ[[j]])[1]
+    d1$yyy<-d1[,covar[j]]
+    ref.n1<-nrow(d1[d1[,covar[j]]==ref,])
+    cov.n1<-nrow(d1[d1[,covar[j]]!=ref,])
+    tot1<-nrow(d1)
+
+    responder<-NULL
+    for (i in 1:length(param)){
+      d1$ln_value = log(d1[,param[i]])
+      model = lm(ln_value~yyy, d1)
+      GMR   = exp(coefficients(model)[2])
+      CI_90 = exp(confint(model, level = 0.9))[2,]
+      resp1<-data.frame(mean=GMR,lower=CI_90[1],upper=CI_90[2],parameter=label[i],label=lab,reference=ref,ref.n=ref.n1,cov.n=cov.n1,tot.n=tot1)
+      responder<-rbind(responder,resp1)
+    }
+    responder1<-rbind(responder1,responder)
+  }}
+
+
+
 #' Prepare dataset for Forest plot in Shiny App
 #'
 #' Generate dataset for coveffectsplot
@@ -42,8 +85,6 @@ forest.dat<-function(data=t,parameter=c("Cmax..ng.mL.","AUCtau..ng.h.mL."),catco
     }
   tx1
 }
-
-
 
 
 ####BOXPLOT
