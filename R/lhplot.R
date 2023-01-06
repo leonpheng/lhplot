@@ -1334,36 +1334,41 @@ dev.off()}
 #' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
 #' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 
-lh_indiv_plot<-function (data=res1, id = "NMID", n.plots.page = 9, time = "TAD",
+lh_indiv_plot<-function (data = res1, id = "NMID", n.plots.page = 9, time = "TAD",
                          dv = "DV", ipred = "IPRED", pred = "PRED",
-                         smooth = "no", type = "linear", xtit = "Time after first dose (h)",
-                         ytit = "Concentration (ng/mL)",out.path="./V1/ind.plots",
-                         break2=c(1e-04, 5e-04, 0.001, 0.005, 0.1, 0.5, 1,
-                                  5, 10, 100, 10^3, 10^4, 10^5, 10^6),p.dpi=300,p.width=6,p.height=6){
+                         plot.obs.type ="both", type = "linear", xtit = "Time after first dose (h)",
+                         ytit = "Concentration (ng/mL)", out.path = "./V1/ind.plots",
+                         break2 = c(1e-04, 5e-04, 0.001, 0.005, 0.1, 0.5, 1, 5, 10,
+                                    100, 10^3, 10^4, 10^5, 10^6), p.dpi = 300, p.width = 6,
+                         p.height = 6)
+{
   library(scales)
   library(ggplot2)
   dir.create(out.path)
   npepage <- n.plots.page
   n <- length(unique(data[, id]))
-  totpage<-ceiling(n/npepage)
-  uid<-unique(unique(data[, id]))
-
-  data$dum <-as.character(data[,id])
-  dat<-data|>
-    select(dum)|>
-    distinct(dum)
-  dat2<-data.frame(keep=rep(1:npepage,each=npepage))
-  dat<-lhcbind(dat,dat2$keep)|>
-    filter(dum!="")
-  data<-data|>
-    dplyr::left_join(dat)
-
-  for (i in 1:totpage){
-    ddat <- data[data$dat2%in%i,]
+  totpage <- ceiling(n/npepage)
+  uid <- unique(unique(data[, id]))
+  data$dum <- as.character(data[, id])
+  dat <- distinct(select(data, dum), dum)
+  dat2 <- data.frame(keep = rep(1:npepage, each = npepage))
+  dat <- filter(lhcbind(dat, dat2$keep), dum != "")
+  data <- dplyr::left_join(data, dat)
+  for (i in 1:totpage) {
+    ddat <- data[data$dat2 %in% i, ]
     ddat$usubjid <- ddat[, id]
     ddat$TIME <- ddat[, time]
     ddat$DV <- ddat[, dv]
-    p <- ggplot(ddat, aes(x = TIME, y = DV)) + geom_point(aes(col = "Observed"))
+
+    p <- ggplot(ddat, aes(x = TIME, y = DV))
+
+
+    if(plot.obs.type=="both"){
+      p <- p + geom_point(aes(col = "Observed"))+geom_line(aes(col = "Observed"))}
+    if(plot.obs.type=="point"){
+      p <- p + geom_point(aes(col = "Observed"))}
+    if(plot.obs.type=="point"){p <- p +geom_line(aes(col = "Observed"))}
+
     if (!is.null(ipred)) {
       ddat$IPRED <- ddat[, ipred]
       p <- p + geom_line(aes(y = IPRED, col = "IPRED"))
@@ -1372,6 +1377,7 @@ lh_indiv_plot<-function (data=res1, id = "NMID", n.plots.page = 9, time = "TAD",
       ddat$PRED <- ddat[, pred]
       p <- p + geom_line(aes(y = PRED, col = "PRED"))
     }
+
     p <- p + ggplot2::facet_wrap(~usubjid, scales = "free")
     if (type == "log") {
       p = p + ggplot2::scale_y_log10(breaks = break2)
@@ -1384,29 +1390,20 @@ lh_indiv_plot<-function (data=res1, id = "NMID", n.plots.page = 9, time = "TAD",
     p = p + ggplot2::scale_x_continuous() + ggplot2::xlab(xtit) +
       ggplot2::ylab(ytit) + ggplot2::theme_bw() + ggplot2::theme(legend.title = element_blank())
     if (type != "both") {
-      nm <- paste0(output.name,"/page_", i, "_",
+      nm <- paste0(output.name, "/page_", i, "_",
                    type, ".png")
-      ggsave(nm, p,dpi=p.dpi,width = p.width,height = p.height)
+      ggsave(nm, p, dpi = p.dpi, width = p.width, height = p.height)
     }
     if (type == "both") {
-      nm <- paste0(out.path,"/page_", i, "_lin",
+      nm <- paste0(out.path, "/page_", i, "_lin",
                    ".png")
-      ggsave(nm, p,dpi=p.dpi,width = p.width,height = p.height)
-      nm <- paste0(out.path,"/page_", i, "_log",
+      ggsave(nm, p, dpi = p.dpi, width = p.width, height = p.height)
+      nm <- paste0(out.path, "/page_", i, "_log",
                    ".png")
-      ggsave(nm, p1,dpi=p.dpi,width = p.width,height = p.height)
+      ggsave(nm, p1, dpi = p.dpi, width = p.width, height = p.height)
     }
-    # doc <- officer::body_add_gg(doc, p, width = 7.08, height = 5.9)
-    # if (type == "both") {
-    #   doc <- officer::body_add_gg(doc, p1, width = 7.08,
-    #                               height = 5.9)
-    # }
-    # if (!is.null(output.name)) {
-    #   print(doc, output.name)
-    # }
   }
 }
-
 
 #' EXPLORATORY Individual plots
 #'
