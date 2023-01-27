@@ -5,17 +5,17 @@
 \title{BOXPLOT MC SIMULATION}
 \usage{
 lh_boxplot2(
-  data = NULL,
-  y.dat = NULL,
-  x.dat = NULL,
-  x.title = NULL,
-  y.title = NULL,
-  target = NULL,
+  data = sim[sim$freq == "BID", ],
+  y.dat = "Cavg",
+  x.dat = "AGEGRP",
+  x.title = "",
+  y.title = "",
+  target = c(100, 320),
   add.obs.point = "no",
   add.stats = "no",
   stat.label.space = c(0.1, 0.2),
-  max.y = NULL,
-  min.y = NULL,
+  min.y = 0,
+  max.y = 1000,
   increm.y = 100,
   box.stats = c("quantile(x,0.05)", "quantile(x,0.25)", "quantile(x,0.5)",
     "quantile(x,0.75)", "quantile(x,0.95)"),
@@ -48,9 +48,9 @@ lh_boxplot2(
 
 \item{stat.label.space}{adjust spacing between each stats in the figure}
 
-\item{max.y}{set maximum value of y axis. Use this parameter for setting the lower boundary of the stats values in the figure}
-
 \item{min.y}{set minimum value of y axis}
+
+\item{max.y}{set maximum value of y axis. Use this parameter for setting the lower boundary of the stats values in the figure}
 
 \item{increm.y}{set y axis ticks}
 

@@ -479,18 +479,17 @@ ggplot(data,aes(x,y,label=id))+
 #' @examples stat.label.space=c(0.1,0.2),jit=c(0.15,0)) +theme_bw()+ theme(axis.text.x #'
 #' @examples = element_text(angle = 45, hjust = 1))+scale_y_log10()
 
-
-lh_boxplot2<-function(data=NULL,
-                      y.dat=NULL,
-                      x.dat=NULL,
-                      x.title=NULL,
-                      y.title=NULL,
-                      target=NULL,
+lh_boxplot2<-function(data=sim[sim$freq=="BID",],
+                      y.dat="Cavg",
+                      x.dat="AGEGRP",
+                      x.title="",
+                      y.title="",
+                      target=c(100,320),
                       add.obs.point="no",
                       add.stats="no",
                       stat.label.space=c(0.1,0.2),
-                      max.y=NULL,
-                      min.y=NULL,
+                      min.y = 0,
+                      max.y =1000,
                       increm.y=100,
                       box.stats=c("quantile(x,0.05)","quantile(x,0.25)","quantile(x,0.5)","quantile(x,0.75)","quantile(x,0.95)"),
                       box.target=NULL,
@@ -561,7 +560,7 @@ lh_boxplot2<-function(data=NULL,
   }
 
 
-  var<-y
+  #var<-y
   targ$hi<-with(targ,paste0(round(hi,0),"%"))
   targ$wi<-with(targ,paste0(round(wi,0),"%"))
   targ$lo<-with(targ,paste0(round(lo,0),"%"))
