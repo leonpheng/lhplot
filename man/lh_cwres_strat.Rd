@@ -9,7 +9,7 @@ lh_cwres_strat(
   x,
   y,
   id,
-  xlab = "Population Predictions (µg/mL)",
+  xlab = "Population Predictions (μg/mL)",
   ylab = "Conditional Weighted Residual",
   by = "Age_Group"
 )

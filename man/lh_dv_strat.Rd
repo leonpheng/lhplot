@@ -9,8 +9,8 @@ lh_dv_strat(
   x,
   y,
   id,
-  xlab = "Individual Predictions (µg/mL)",
-  ylab = "Observed\\n Concentrations (Âµg/mL)",
+  xlab = "Individual Predictions (μg/mL)",
+  ylab = "Observed\\n Concentrations (μg/mL)",
   by = "Age_Group"
 )
 }

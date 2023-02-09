@@ -17,8 +17,7 @@ lh_indiv_plot(
   xtit = "Time after first dose (h)",
   ytit = "Concentration (ng/mL)",
   out.path = "./V1/ind.plots",
-  break2 = c(1e-04, 5e-04, 0.001, 0.005, 0.1, 0.5, 1, 5, 10, 100, 10^3, 10^4, 10^5,
-    10^6),
+  break2 = c(1e-04, 5e-04, 0.001, 0.005, 0.1, 0.5, 1, 5, 10, 100, 10^3, 10^4, 10^5, 10^6),
   p.dpi = 300,
   p.width = 6,
   p.height = 6

@@ -9,8 +9,8 @@ gpairs(
   upper.pars = list(scatter = "points", conditional = "barcode", mosaic = "mosaic"),
   lower.pars = list(scatter = "points", conditional = "boxplot", mosaic = "mosaic"),
   diagonal = "default",
-  outer.margins = list(bottom = unit(2, "lines"), left = unit(2, "lines"), top =
-    unit(2, "lines"), right = unit(2, "lines")),
+  outer.margins = list(bottom = unit(2, "lines"), left = unit(2, "lines"), top = unit(2,
+    "lines"), right = unit(2, "lines")),
   xylim = NULL,
   outer.labels = NULL,
   outer.rot = c(0, 90),
