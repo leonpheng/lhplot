@@ -17,8 +17,7 @@ tips.plot<-function(...){
   c("theme(axis.text.x  = element_text(vjust=0, size=10,angle = 90),
     axis.text.y  = element_text(size=14),
     axis.title  = element_text(size=14),
-    legend.position=qq bottom qq)"))}
-
+    legend.position=qq bottom qq)")))}
 
 
 #' Prepare dataset for Forest plot data for Forestplot package
