@@ -1339,14 +1339,22 @@ dev.off()}
 #' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
 #' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 
-lh_indiv_plot<-function (data = res1, id = "NMID", n.plots.page = 9, time = "TAD",
-                         dv = "DV", ipred = "IPRED", pred = "PRED",
-                         plot.obs.type ="both", type = "linear", xtit = "Time after first dose (h)",
-                         ytit = "Concentration (ng/mL)", out.path = "./V1/ind.plots",
-                         break2 = c(1e-04, 5e-04, 0.001, 0.005, 0.1, 0.5, 1, 5, 10,
-                                    100, 10^3, 10^4, 10^5, 10^6), p.dpi = 300, p.width = 6,
-                         p.height = 6)
+lh_indiv_plot<-function (data = res1, id = "id", n.plots.page = 9, time = "IVAR",
+                         dv = "DV", ipred = "IPRED", pred = "PRED", plot.obs.type = "point",
+                         type = "linear", xtit = "Time after first dose (h)", ytit = "Concentration (ng/mL)",
+                         out.path = "./ind.plots", break2 = c(1e-04, 5e-04, 0.001,
+                                                              0.005, 0.1, 0.5, 1, 5, 10, 100, 10^3, 10^4, 10^5, 10^6),
+                         p.dpi = 300, p.width = 6, p.height = 6)
 {
+
+  theme_set(theme_bw()+
+              theme(legend.title=element_blank(),
+                    legend.position="bottom",
+                    legend.box="horizontal",
+                    legend.key.width=grid::unit(1.3, "cm")))
+
+  thm=theme(axis.text.x  = element_text(vjust=0, size=10,angle = 90),axis.text.y  = element_text(size=14),
+            axis.title  = element_text(size=14),legend.position="bottom")
   library(scales)
   library(ggplot2)
   dir.create(out.path)
@@ -1364,16 +1372,16 @@ lh_indiv_plot<-function (data = res1, id = "NMID", n.plots.page = 9, time = "TAD
     ddat$usubjid <- ddat[, id]
     ddat$TIME <- ddat[, time]
     ddat$DV <- ddat[, dv]
-
     p <- ggplot(ddat, aes(x = TIME, y = DV))
-
-
-    if(plot.obs.type=="both"){
-      p <- p + geom_point(aes(col = "Observed"))+geom_line(aes(col = "Observed"))}
-    if(plot.obs.type=="point"){
-      p <- p + geom_point(aes(col = "Observed"))}
-    if(plot.obs.type=="point"){p <- p +geom_line(aes(col = "Observed"))}
-
+    if (plot.obs.type == "both") {
+      p <- p + geom_point(aes(col = "Observed")) + geom_line(aes(col = "Observed"))
+    }
+    if (plot.obs.type == "point") {
+      p <- p + geom_point(aes(col = "Observed"))
+    }
+    if (plot.obs.type == "point") {
+      p <- p + geom_line(aes(col = "Observed"))
+    }
     if (!is.null(ipred)) {
       ddat$IPRED <- ddat[, ipred]
       p <- p + geom_line(aes(y = IPRED, col = "IPRED"))
@@ -1382,31 +1390,28 @@ lh_indiv_plot<-function (data = res1, id = "NMID", n.plots.page = 9, time = "TAD
       ddat$PRED <- ddat[, pred]
       p <- p + geom_line(aes(y = PRED, col = "PRED"))
     }
-
     p <- p + ggplot2::facet_wrap(~usubjid, scales = "free")
     if (type == "log") {
       p = p + ggplot2::scale_y_log10(breaks = break2)
     }
-    if (type == "both") {
-      p1 = p + ggplot2::scale_y_log10(breaks = break2)
-      p1 = p1 + ggplot2::scale_x_continuous() + ggplot2::xlab(xtit) +
-        ggplot2::ylab(ytit) + ggplot2::theme_bw() + ggplot2::theme(legend.title = element_blank())
-    }
+    #if (type == "both") {
+    p1 = p + ggplot2::scale_y_log10(breaks = break2)
+    p1 = p1 + ggplot2::scale_x_continuous() + ggplot2::xlab(xtit) +
+      ggplot2::ylab(ytit) + ggplot2::theme_bw() + ggplot2::theme(legend.title = element_blank())+thm
+    #}
     p = p + ggplot2::scale_x_continuous() + ggplot2::xlab(xtit) +
-      ggplot2::ylab(ytit) + ggplot2::theme_bw() + ggplot2::theme(legend.title = element_blank())
-    if (type != "both") {
-      nm <- paste0(output.name, "/page_", i, "_",
-                   type, ".png")
-      ggsave(nm, p, dpi = p.dpi, width = p.width, height = p.height)
-    }
-    if (type == "both") {
-      nm <- paste0(out.path, "/page_", i, "_lin",
-                   ".png")
-      ggsave(nm, p, dpi = p.dpi, width = p.width, height = p.height)
-      nm <- paste0(out.path, "/page_", i, "_log",
-                   ".png")
-      ggsave(nm, p1, dpi = p.dpi, width = p.width, height = p.height)
-    }
+      ggplot2::ylab(ytit) + ggplot2::theme_bw() + ggplot2::theme(legend.title = element_blank())+thm
+
+    #if (type != "both") {
+    nm <- paste0(out.path, "/page_", i, "_", type,
+                 ".png")
+    ggsave(nm, p, dpi = p.dpi, width = p.width, height = p.height)
+    #if (type == "both") {
+    nm <- paste0(out.path, "/page_", i, "_log", ".png")
+    ggsave(nm, p1, dpi = p.dpi, width = p.width, height = p.height)
+    nm <- paste0(out.path, "/page_", i, "_log", ".png")
+    ggsave(nm, p1, dpi = p.dpi, width = p.width, height = p.height)
+
   }
 }
 
