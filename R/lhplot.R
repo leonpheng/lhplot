@@ -1346,15 +1346,12 @@ lh_indiv_plot<-function (data = res1, id = "id", n.plots.page = 9, time = "IVAR"
                                                               0.005, 0.1, 0.5, 1, 5, 10, 100, 10^3, 10^4, 10^5, 10^6),
                          p.dpi = 300, p.width = 6, p.height = 6)
 {
-
-  theme_set(theme_bw()+
-              theme(legend.title=element_blank(),
-                    legend.position="bottom",
-                    legend.box="horizontal",
-                    legend.key.width=grid::unit(1.3, "cm")))
-
-  thm=theme(axis.text.x  = element_text(vjust=0, size=10,angle = 90),axis.text.y  = element_text(size=14),
-            axis.title  = element_text(size=14),legend.position="bottom")
+  theme_set(theme_bw() + theme(legend.title = element_blank(),
+                               legend.position = "bottom", legend.box = "horizontal",
+                               legend.key.width = grid::unit(1.3, "cm")))
+  thm = theme(axis.text.x = element_text(vjust = 0, size = 10,
+                                         angle = 90), axis.text.y = element_text(size = 14), axis.title = element_text(size = 14),
+              legend.position = "bottom")
   library(scales)
   library(ggplot2)
   dir.create(out.path)
@@ -1362,13 +1359,18 @@ lh_indiv_plot<-function (data = res1, id = "id", n.plots.page = 9, time = "IVAR"
   n <- length(unique(data[, id]))
   totpage <- ceiling(n/npepage)
   uid <- unique(unique(data[, id]))
-  data$dum <- as.character(data[, id])
-  dat <- distinct(select(data, dum), dum)
-  dat2 <- data.frame(keep = rep(1:npepage, each = npepage))
-  dat <- filter(lhcbind(dat, dat2$keep), dum != "")
-  data <- dplyr::left_join(data, dat)
+  l1<-seq(0,totpage-1)*n.plots.page+1
+  l2<-seq(1,totpage)*n.plots.page
+
+  #data$dum <- as.character(data[, id])
+  #dat <- unique(data$dum)
+  #  dat2 <- data.frame(keep = rep(1:npepage, each = npepage))
+  #  dat <- filter(lhcbind(dat,dat2$keep), dum != "")
+  #  data <- dplyr::left_join(data, dat)
+
   for (i in 1:totpage) {
-    ddat <- data[data$dat2 %in% i, ]
+    x<-uid[l1[i]:l2[i]];x<-x[!is.na(x)]
+    ddat <- data[data[,id]%in%x, ]
     ddat$usubjid <- ddat[, id]
     ddat$TIME <- ddat[, time]
     ddat$DV <- ddat[, dv]
@@ -1394,83 +1396,20 @@ lh_indiv_plot<-function (data = res1, id = "id", n.plots.page = 9, time = "IVAR"
     if (type == "log") {
       p = p + ggplot2::scale_y_log10(breaks = break2)
     }
-    #if (type == "both") {
     p1 = p + ggplot2::scale_y_log10(breaks = break2)
     p1 = p1 + ggplot2::scale_x_continuous() + ggplot2::xlab(xtit) +
-      ggplot2::ylab(ytit) + ggplot2::theme_bw() + ggplot2::theme(legend.title = element_blank())+thm
-    #}
+      ggplot2::ylab(ytit) + ggplot2::theme_bw() + ggplot2::theme(legend.title = element_blank()) +
+      thm
     p = p + ggplot2::scale_x_continuous() + ggplot2::xlab(xtit) +
-      ggplot2::ylab(ytit) + ggplot2::theme_bw() + ggplot2::theme(legend.title = element_blank())+thm
-
-    #if (type != "both") {
-    nm <- paste0(out.path, "/page_", i, "_", type,
-                 ".png")
+      ggplot2::ylab(ytit) + ggplot2::theme_bw() + ggplot2::theme(legend.title = element_blank()) +
+      thm
+    nm <- paste0(out.path, "/page_", i, "_", type, ".png")
     ggsave(nm, p, dpi = p.dpi, width = p.width, height = p.height)
-    #if (type == "both") {
     nm <- paste0(out.path, "/page_", i, "_log", ".png")
     ggsave(nm, p1, dpi = p.dpi, width = p.width, height = p.height)
     nm <- paste0(out.path, "/page_", i, "_log", ".png")
     ggsave(nm, p1, dpi = p.dpi, width = p.width, height = p.height)
-
   }
-}
-
-#' EXPLORATORY Individual plots
-#'
-#' Generate DATA
-#' @param data Data frame
-#' @param output.name Listing is generated in word document.
-#' @keywords lh_indiv_plot
-#' @export
-#' @examples lh_explor_ind(data=dat1,id="usubjid",n.plots.page=9,time="time",dv="dv",ipred="ipred"#' #' @examples ,pred="pred",type="linear",
-#' @examples xtit="Time after first dose (h)",
-#' @example  sytit="Concentration (ng/mL)",output.name="Individiual.docx")
-#' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
-#' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
-
-lh_explor_ind<-function(data,dose="amt",id="id",n.plots.page=9,time="time",dv="dv",ipred=NULL,pred=NULL,type="linear",xtit="Time after first dose (h)",ytit="Concentration (ng/mL)",output.name="./test.docx")
-{
-  data[,dose][!is.na(data[,dose])&data[,dose]==0]<-NA
-  data[,dv][!is.na(data[,dose])]<-NA
-  head(data)
-  library(scales)
-  library(ggplot2)
-  npepage<-n.plots.page
-  n<-length(unique(data[,id]))
-  page<-1:ceiling(n/npepage)
-  nb_pg2<-page*9
-  nb_pg1<-c(1,nb_pg2[1:(length(nb_pg2)-1)]+1)
-  head(data)
-
-  doc<-officer::read_docx()
-  for(i in 1:length(nb_pg2)){
-    ddat<-data[data[,id]%in%unique(data[,id])[nb_pg1[i]:nb_pg2[i]],]
-    ddat$usubjid<-ddat[,id]
-ddat<-dplyr::left_join(ddat,lhtool2::addvar(ddat[!is.na(ddat[,dv])&ddat[,dv]>0,c(id,dv)],id,dv,"min(x)/2","no","dose"))
-  ddat$time<-ddat[,time]
-    break2<-c(0.0001,0.0005,0.001,0.005,0.1,0.5,1,5,10,100,10^3,10^4,10^5,10^6)
-p<-ggplot2::ggplot(ddat[is.na(ddat$amt),],aes_string(x=time,y=dv))+
-      ggplot2::geom_point(aes(col="Observed"))+
-      ggplot2::geom_line()
-    if(!is.null(ipred)){
-      p<-p+ggplot2::geom_line(aes(y=ipred,linetype="IPRED"),col="blue")
-    }
-    if(!is.null(pred)){
-      p<-p+ggplot2::geom_line(aes(y=pred,linetype="PRED"),col="red")
-    }
-    p<-p+ggplot2::geom_point(data=ddat[!is.na(ddat$amt),],aes(x=time,y=dose,col="Dose"),shape=17)
-    p<-p+ggplot2::facet_wrap(~usubjid,scales="free")
-    if(type=="log"){
-      p=p+ ggplot2::scale_y_log10(breaks = break2)}
-    p=p+ ggplot2::scale_x_continuous()+
-      ggplot2::xlab(xtit)+ggplot2::ylab(ytit)+
-      ggplot2::theme_bw()+
-      ggplot2::theme(legend.title=element_blank())
-
-    doc<-officer::body_add_gg(doc,p,width=7.08,height=5.9)
-  }
-  if(!is.null(output.name)){
-    print(doc,output.name)}else{doc}
 }
 
 
