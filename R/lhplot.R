@@ -1340,18 +1340,27 @@ dev.off()}
 #' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 
 lh_indiv_plot<-function (data = res1, id = "id", n.plots.page = 9, time = "IVAR",
-                         dv = "DV", ipred = "IPRED", pred = "PRED", plot.obs.type = "point",
-                         type = "linear", xtit = "Time after first dose (h)", ytit = "Concentration (ng/mL)",
+                         dv = "DV", ipred = "IPRED", pred = "PRED", plot.obs.type = "point",scale="fixed",
+                         xxis=list(anglex=0,sizex=12,vjustx=0,strip_size=12,axis.title.size=14),
+                         legendxy=list(posit="bottom"),
+                         xtit = "Time after first dose (h)",
+                         ytit = "Concentration (ng/mL)",
                          out.path = "./ind.plots", break2 = c(1e-04, 5e-04, 0.001,
                                                               0.005, 0.1, 0.5, 1, 5, 10, 100, 10^3, 10^4, 10^5, 10^6),
                          p.dpi = 300, p.width = 6, p.height = 6)
 {
-  theme_set(theme_bw() + theme(legend.title = element_blank(),
-                               legend.position = "bottom", legend.box = "horizontal",
-                               legend.key.width = grid::unit(1.3, "cm")))
-  thm = theme(axis.text.x = element_text(vjust = 0, size = 10,
-                                         angle = 90), axis.text.y = element_text(size = 14), axis.title = element_text(size = 14),
-              legend.position = "bottom")
+  theme_set(theme_bw())
+  #theme(legend.title = element_blank(),
+  #  legend.position = "bottom", legend.box = "horizontal",
+  #   legend.key.width = grid::unit(1.3, "cm")))
+  thm = theme(axis.text.x = element_text(vjust =xxis$vjustx, size = xxis$sizex,
+                                         angle = xxis$anglex),
+              axis.title.x = element_text(size =xxis$axis.title.size),
+              axis.title.y = element_text(size =xxis$axis.title.size),
+              axis.text = element_text(size =xxis$sizex),
+              legend.position = "bottom",
+              strip.text.x = element_text(size =xxis$strip_size))
+
   library(scales)
   library(ggplot2)
   dir.create(out.path)
@@ -1359,31 +1368,27 @@ lh_indiv_plot<-function (data = res1, id = "id", n.plots.page = 9, time = "IVAR"
   n <- length(unique(data[, id]))
   totpage <- ceiling(n/npepage)
   uid <- unique(unique(data[, id]))
-  l1<-seq(0,totpage-1)*n.plots.page+1
-  l2<-seq(1,totpage)*n.plots.page
-
-  #data$dum <- as.character(data[, id])
-  #dat <- unique(data$dum)
-  #  dat2 <- data.frame(keep = rep(1:npepage, each = npepage))
-  #  dat <- filter(lhcbind(dat,dat2$keep), dum != "")
-  #  data <- dplyr::left_join(data, dat)
-
+  l1 <- seq(0, totpage - 1) * n.plots.page + 1
+  l2 <- seq(1, totpage) * n.plots.page
   for (i in 1:totpage) {
-    x<-uid[l1[i]:l2[i]];x<-x[!is.na(x)]
-    ddat <- data[data[,id]%in%x, ]
+    x <- uid[l1[i]:l2[i]]
+    x <- x[!is.na(x)]
+    ddat <- data[data[, id] %in% x, ]
     ddat$usubjid <- ddat[, id]
     ddat$TIME <- ddat[, time]
     ddat$DV <- ddat[, dv]
     p <- ggplot(ddat, aes(x = TIME, y = DV))
+
     if (plot.obs.type == "both") {
       p <- p + geom_point(aes(col = "Observed")) + geom_line(aes(col = "Observed"))
     }
     if (plot.obs.type == "point") {
       p <- p + geom_point(aes(col = "Observed"))
     }
-    if (plot.obs.type == "point") {
+    if (plot.obs.type == "line") {
       p <- p + geom_line(aes(col = "Observed"))
     }
+
     if (!is.null(ipred)) {
       ddat$IPRED <- ddat[, ipred]
       p <- p + geom_line(aes(y = IPRED, col = "IPRED"))
@@ -1392,7 +1397,8 @@ lh_indiv_plot<-function (data = res1, id = "id", n.plots.page = 9, time = "IVAR"
       ddat$PRED <- ddat[, pred]
       p <- p + geom_line(aes(y = PRED, col = "PRED"))
     }
-    p <- p + ggplot2::facet_wrap(~usubjid, scales = "free")
+    p <- p + ggplot2::facet_wrap(~usubjid,scales=scale)#, scales = "free"
+
     if (type == "log") {
       p = p + ggplot2::scale_y_log10(breaks = break2)
     }
@@ -1411,7 +1417,6 @@ lh_indiv_plot<-function (data = res1, id = "id", n.plots.page = 9, time = "IVAR"
     ggsave(nm, p1, dpi = p.dpi, width = p.width, height = p.height)
   }
 }
-
 
 #############################################
 #' CONTINUOUS SCATTER vs ETA
