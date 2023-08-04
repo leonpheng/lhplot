@@ -4,7 +4,12 @@
 \alias{lh_cwres_dist}
 \title{DISTRIBUTION OF CWRES}
 \usage{
-lh_cwres_dist(data, cwres = "cwres", file.name = "dist_QQ_CWRES.png")
+lh_cwres_dist(
+  data,
+  cwres = "p",
+  file.name = "dist_QQ_CWRES.png",
+  xylab = "CWRES"
+)
 }
 \arguments{
 \item{data}{Data frame, merged ETA and COVAR data}

@@ -4,7 +4,7 @@
 \alias{qqplot.cwres}
 \title{DISTRIBUTION OF CWRES internal}
 \usage{
-qqplot.cwres(dat, ...)
+qqplot.cwres(dat, xylab)
 }
 \arguments{
 \item{data}{Data frame, merged ETA and COVAR data}

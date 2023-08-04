@@ -1280,12 +1280,12 @@ lh_eta_dist<-function (data=eta1, lst.eta =c("Ka","F","Vc"), ncol = 3, nrow = 2,
 #' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
 #' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 
-qqplot.cwres <- function(dat, ...) {
+qqplot.cwres <- function(dat,xylab) {
   ylim <-c(-10, 10)
   xlim <-c(-4, 4)
   xlab <- "Quantiles of Standard Normal"
-  ylab <- "Conditional Weighted Residuals"
-  with(dat, qqnorm(cwres, ylim=ylim, xlim=xlim, xlab=xlab, ylab=ylab, ...))
+  #ylab <-lab# "Conditional Weighted Residuals"
+  with(dat, qqnorm(cwres, ylim=ylim, xlim=xlim, xlab=xlab, ylab=xylab))
   with(dat, qqline(cwres))
   abline(a=0,b=1,col="red") #add the standard normal qqplot
 }
@@ -1298,11 +1298,11 @@ qqplot.cwres <- function(dat, ...) {
 #' @keywords histogram.cwres
 #' @export
 #' @examples p1<-lh_con_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
-
-hist.cwres <- function(dat, ...) {
+hist.cwres <- function(dat,xylab) {
   ylim <-c(0, 0.55)
-  xlab <- "Conditional Weighted Residuals"
-  with(dat, hist(cwres, ylim=ylim, xlab=xlab, main="", freq=FALSE, ...))
+  #xlab <-lab#"Conditional Weighted Residuals"
+  #with(dat,hist(cwres, ylim=ylim, xlab=xlab, main="", freq=FALSE, ...))
+  with(dat,hist(cwres, ylim=ylim, xlab=xylab, main="", freq=FALSE))
   abline(v=0, lty=2, lwd=3, col="gray")
   xs <- seq(-10, 140, len=100)
   lines(xs, dnorm(xs), col="gray", lwd=3)
@@ -1316,13 +1316,12 @@ hist.cwres <- function(dat, ...) {
 #' @export
 #' @examples p1<-lh_con_cov(data=cateta,lst.eta=keta,lst.cov=cat,save.path=NULL)
 
-lh_cwres_dist<-function(data,cwres="cwres",file.name="dist_QQ_CWRES.png"){
+lh_cwres_dist<-function(data,cwres="p",file.name="dist_QQ_CWRES.png",xylab="CWRES"){
 names(data)[names(data)==cwres]<-"cwres"
-
 png(file =file.name , width = 8, height = 6, units = 'in', res = 300)
 par(mfrow = c(1, 2))
-qqplot.cwres(data)
-hist.cwres(data)
+qqplot.cwres(data,xylab)
+hist.cwres(data,xylab)
 dev.off()}
 
 

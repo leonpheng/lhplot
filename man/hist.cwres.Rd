@@ -4,7 +4,7 @@
 \alias{hist.cwres}
 \title{DISTRIBUTION OF CWRES internal}
 \usage{
-\method{hist}{cwres}(dat, ...)
+\method{hist}{cwres}(dat, xylab)
 }
 \arguments{
 \item{data}{Data frame, merged ETA and COVAR data}
