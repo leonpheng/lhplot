@@ -922,6 +922,25 @@ lh_cwres_tad<-function(data,y="CWRES",
 p
 }
 
+#' Estimate LOESS Fit
+#'
+#' Generate GOF1
+#' @param data data frame
+#' @param x x values
+#' @param y y values
+#' @keywords lhloess
+#' @export
+#' @examples data$TIME<-data$RTIME;p1<-lh_cwres_time(dat1)
+
+lhloess<-function(data=base,x="basemed",y="CHG",span=1){
+  x1 = data[, x]
+  y1 = data[, y]
+  data1=data.frame(x1,y1)
+  data1$pred<-predict(loess(data1$y1 ~ data1$x1, tmp, span =span),
+                      data1$x1)
+  names(data1)<-c(x,y,"pred")
+  data1
+}
 
 #' CWRES vs RTIME or TIME
 #'
@@ -1005,58 +1024,56 @@ lh_cwres_time<-function(data,y="CWRES",
 #' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
 #' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 
-lh_cwres_x<-function(data,y="CWRES",
-                        x="PREDN",type="log",scale=c(0.1,100),
-                        PREDN="Population Predicted Concentration (ng/mL)",
-                        CWRESN="Conditional Weighted Residuals",
-                        col.obs="#A6CEE3",col.ident="#1F78B4",strat=NULL){
-
-  if(!is.null(strat)){
-    cw<-data[,c(x,y,strat)]
-    names(cw)<-c("x","y","strat")}else{
-      cw<-data[,c(x,y)]
-      names(cw)<-c("x","y")}
-  if("auto"%in%scale){
+lh_cwres_x<-function (data, y = "CWRES", x = "PREDN", type = "log", scale = c(0.1,
+                                                                              100), PREDN = "Population Predicted Concentration (ng/mL)",
+                      CWRESN = "Conditional Weighted Residuals", col.obs = "#A6CEE3",
+                      col.ident = "#1F78B4", strat = NULL,smooth="loess")
+{
+  if (!is.null(strat)) {
+    cw <- data[, c(x, y, strat)]
+    names(cw) <- c("x", "y", "strat")
+  }  else {
+    cw <- data[, c(x, y)]
+    names(cw) <- c("x", "y")
+  }
+  if ("auto" %in% scale) {
     limx <- range(cw$x, cw$y)
-    if(min(limx)==0){
-      limx1 <-c(0.01,10^ceiling(log10(max(limx))))}else{
-        limx1 <-c(10^floor(log10(min(limx))),10^ceiling(log10(max(limx))))
-      }}else{
-        limx <-scale
-        limx1 <-c(10^floor(log10(scale[1])),10^ceiling(log10(scale[2])))
-      }
-
-  cols <- c("Observed"=col.obs)
-  cols1 <- c("Identity"=col.ident)
-if(is.null(strat)){
-    p<-ggplot2::ggplot(cw,aes(x=x,y=y))+
-      geom_point(aes(col=factor(z)))+
-      xlab(PREDN)+ylab(CWRESN)+
-      geom_hline(aes(yintercept=0),linetype="solid") +
-      geom_hline(yintercept=c(-4,4,-6,6),linetype = "dashed",col="grey")+
-      geom_smooth(method="loess", method.args=list(span=2/3, degree=1, family="symmetric"), se=F,linetype="dashed")+
-      scale_x_continuous(labels = function(x) format(x, scientific =F))+
-      scale_y_continuous(limits=c(-8,8),breaks=seq(-8,8,2))+
-      scale_linetype_discrete(name = "")+
-      guides(col=guide_legend(title=strat))+
-      theme_bw()
-  }else{
+    if (min(limx) == 0) {
+      limx1 <- c(0.01, 10^ceiling(log10(max(limx))))
+    }    else {
+      limx1 <- c(10^floor(log10(min(limx))), 10^ceiling(log10(max(limx))))
+    }
+  }  else {
+    limx <- scale
+    limx1 <- c(10^floor(log10(scale[1])), 10^ceiling(log10(scale[2])))
+  }
+  cols <- c(Observed = col.obs)
+  cols1 <- c(Identity = col.ident)
+  if (is.null(strat)) {
+    p <- ggplot2::ggplot(cw, aes(x = x, y = y)) + geom_point(aes(col = factor(strat))) +
+      xlab(PREDN) + ylab(CWRESN) + geom_hline(aes(yintercept = 0),
+                                              linetype = "solid") + geom_hline(yintercept = c(-4, 4, -6, 6),
+                                                                               linetype = "dashed", col = "grey") + geom_smooth(method = smooth,
+                                                                                                                                method.args = list(span = 2/3, degree = 1, family = "symmetric"),
+                                                                                                                                se = F, linetype = "dashed") + scale_x_continuous(labels = function(x) format(x,
+                                                                                                                                                                                                              scientific = F)) + scale_y_continuous(limits = c(-8,
+                                                                                                                                                                                                                                                               8), breaks = seq(-8, 8, 2)) + scale_linetype_discrete(name = "") +
+      guides(col = guide_legend(title = strat)) + theme_bw()
+  }  else {
     cbp1 <- c("#999999", "#E69F00", "#56B4E9", "#009E73",
               "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-    cw[,"strat"]<-factor(cw[,"strat"])
-    p<-ggplot2::ggplot(cw,aes(x=x,y=y))+
-      geom_point(aes(col=strat))+
-      xlab(PREDN)+ylab(CWRESN)+
-      geom_hline(aes(yintercept=0),linetype="solid") +
-      geom_hline(yintercept=c(-4,4,-6,6),linetype = "dashed",col="grey")+
-      geom_smooth(method="loess", method.args=list(span=2/3, degree=1, family="symmetric"), se=F,linetype="dashed")+
-      scale_x_continuous(labels = function(x) format(x, scientific =F))+
-      scale_y_continuous(limits=c(-8,8),breaks=seq(-8,8,2))+
-      scale_colour_manual(name="Observed",values=cbp1) +
-      scale_linetype_discrete(name = "")+
+    cw[, "strat"] <- factor(cw[, "strat"])
+    p <- ggplot2::ggplot(cw, aes(x = x, y = y)) + geom_point(aes(col = strat)) +
+      xlab(PREDN) + ylab(CWRESN) + geom_hline(aes(yintercept = 0),
+                                              linetype = "solid") + geom_hline(yintercept = c(-4, 4, -6, 6), linetype = "dashed", col = "grey") + geom_smooth(method = smooth,
+                                                                                                                                                              method.args = list(span = 2/3, degree = 1, family = "symmetric"),
+                                                                                                                                                              se = F, linetype = "dashed") + scale_x_continuous(labels = function(x) format(x,
+                                                                                                                                                                                                                                            scientific = F)) + scale_y_continuous(limits = c(-8,
+                                                                                                                                                                                                                                                                                             8), breaks = seq(-8, 8, 2)) +
+      #scale_colour_manual(name = "Observed",values = cbp1) + scale_linetype_discrete(name = "") +
       theme_bw()
   }
-p
+  p
 }
 
 #' CWRES vs PRED

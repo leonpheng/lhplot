@@ -14,7 +14,8 @@ lh_cwres_x(
   CWRESN = "Conditional Weighted Residuals",
   col.obs = "#A6CEE3",
   col.ident = "#1F78B4",
-  strat = NULL
+  strat = NULL,
+  smooth = "loess"
 )
 }
 \arguments{
