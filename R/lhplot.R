@@ -1050,12 +1050,12 @@ lh_cwres_x<-function (data, y = "CWRES", x = "PREDN", type = "log", scale = c(0.
   cols <- c(Observed = col.obs)
   cols1 <- c(Identity = col.ident)
   if (is.null(strat)) {
-    p <- ggplot2::ggplot(cw, aes(x = x, y = y)) + geom_point(aes(col = factor(strat))) +
+    p <- ggplot2::ggplot(cw, aes(x = x, y = y)) + geom_point(aes(col =cols)) +
       xlab(PREDN) + ylab(CWRESN) + geom_hline(aes(yintercept = 0),
                                               linetype = "solid") + geom_hline(yintercept = c(-4, 4, -6, 6),
-                                                                               linetype = "dashed", col = "grey") + geom_smooth(method = smooth,
-                                                                                                                                method.args = list(span = 2/3, degree = 1, family = "symmetric"),
-                                                                                                                                se = F, linetype = "dashed") + scale_x_continuous(labels = function(x) format(x,
+          linetype = "dashed", col = "grey") + geom_smooth(method = smooth,
+                    method.args = list(span = 2/3, degree = 1, family = "symmetric"),
+          se = F, linetype = "dashed") + scale_x_continuous(labels = function(x) format(x,
                                                                                                                                                                                                               scientific = F)) + scale_y_continuous(limits = c(-8,
                                                                                                                                                                                                                                                                8), breaks = seq(-8, 8, 2)) + scale_linetype_discrete(name = "") +
       guides(col = guide_legend(title = strat)) + theme_bw()
