@@ -362,7 +362,7 @@ lh_dv<-function(data,y="DV",
           geom_abline(slope=1,size=1,col="blue")+
           geom_line(aes(x=0,y=0,linetype="Identity"))+
           geom_smooth(method="loess", method.args=list(span=2/3, degree=1, family="symmetric"), se=F,aes(linetype="LOESS"))+
-          scale_colour_manual(name=sortby,values=cols2) +
+          #scale_colour_manual(name=sortby,values=cols2) +
           scale_linetype_discrete(name = "")+
           theme_bw()
       }
@@ -1063,7 +1063,7 @@ lh_cwres_x<-function (data, y = "CWRES", x = "PREDN", type = "log", scale = c(0.
     cbp1 <- c("#999999", "#E69F00", "#56B4E9", "#009E73",
               "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
     cw[, "strat"] <- factor(cw[, "strat"])
-    p <- ggplot2::ggplot(cw, aes(x = x, y = y)) + geom_point(aes(col = strat)) +
+    p <- ggplot2::ggplot(cw, aes(x = x, y = y)) + geom_point(aes(col = strat),alpha = 0.3) +
       xlab(PREDN) + ylab(CWRESN) + geom_hline(aes(yintercept = 0),
                                               linetype = "solid") + geom_hline(yintercept = c(-4, 4, -6, 6), linetype = "dashed", col = "grey") + geom_smooth(method = smooth,
                                                                                                                                                               method.args = list(span = 2/3, degree = 1, family = "symmetric"),
