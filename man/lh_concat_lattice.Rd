@@ -15,6 +15,13 @@ lh_concat_lattice(
   thm = theme(axis.text.x = element_text(vjust = 0.8, hjust = 0.1, size = 9, angle = 90))
 )
 }
+\arguments{
+\item{dat}{Data frame, merged ETA and COVAR data}
+
+\item{cont}{List of continuous}
+
+\item{cat}{List of categorical covariate}
+}
 \description{
 Plot continuous vs categorical covariates
 }

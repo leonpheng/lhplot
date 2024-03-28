@@ -2,6 +2,9 @@
 #' Continuous vs Categorical
 #'
 #' Plot continuous vs categorical covariates
+#' @param dat Data frame, merged ETA and COVAR data
+#' @param cont List of continuous
+#' @param cat List of categorical covariate
 #' @keywords lh_concat_lattice
 #' @export
 #' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
@@ -14,9 +17,9 @@ lh_concat_lattice<-function(dat,cont=c("WT","CRCL","BSA","BMI","AGE"),
                                 "BSA (m^2)",
                                 "BMI (kg/m^2)",
                                 "Age (years)"),
-                      labcat=c("Renal\n Function","Hepatic\n Function (NCI)",
+              labcat=c("Renal\n Function","Hepatic\n Function (NCI)",
                                "ECOG","Tumor\n type"),xtit="",ytit="",
-                      thm=theme(axis.text.x = element_text(vjust=0.8,hjust=0.1,size=9,angle =90))){
+        thm=theme(axis.text.x = element_text(vjust=0.8,hjust=0.1,size=9,angle =90))){
 
 library(lhtool2)
 library(ggplot2)
@@ -59,11 +62,13 @@ p
 #'
 #' tips for plot
 #' @keywords ggplot.theme
+#' @param data no data
 #' @export
 #' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
 #' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 
 ggplot.theme<-function(...){
+  library(ggplot2)
   thm<-theme(strip.text = element_text(size =12, colour ="black"),
   legend.title = element_blank(),
   panel.grid.minor = element_blank(),

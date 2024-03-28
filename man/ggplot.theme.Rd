@@ -4,7 +4,10 @@
 \alias{ggplot.theme}
 \title{ggplot themes}
 \usage{
-\method{ggplot}{theme}(...)
+ggplot.theme(...)
+}
+\arguments{
+\item{data}{no data}
 }
 \description{
 tips for plot
