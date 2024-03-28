@@ -1,4 +1,82 @@
 #############################################
+#' Continuous vs Categorical
+#'
+#' Plot continuous vs categorical covariates
+#' @keywords lh_concat_lattice
+#' @export
+#' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
+#' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
+
+lh_concat_lattice<-function(dat,cont=c("WT","CRCL","BSA","BMI","AGE"),
+                      cat=c("CRCLCAT","NCI","ECOG","TUMTYPE"),
+                      labcont=c("Weight (kg)",
+                                "CRCL (mL/min)",
+                                "BSA (m^2)",
+                                "BMI (kg/m^2)",
+                                "Age (years)"),
+                      labcat=c("Renal\n Function","Hepatic\n Function (NCI)",
+                               "ECOG","Tumor\n type"),xtit="",ytit="",
+                      thm=theme(axis.text.x = element_text(vjust=0.8,hjust=0.1,size=9,angle =90))){
+
+library(lhtool2)
+library(ggplot2)
+theme_set(theme_bw())
+a<-cat
+ca<-cont
+setdiff(a,names(dat))
+
+x<-lhlong(dat[,c(a,ca)],ca)
+names(x)[names(x)%in%c("variable","value")]<-c("contname","contval")
+head(x)
+
+z<-NULL
+for(i in a){
+  x1<-lhlong(x[,c(i,"contname","contval")],a)
+  z<-rbind(z,x1)}
+unique(z$value)
+
+z<-reflag(z,"value",unique(z$value))
+if(!is.null(labcat)){
+z<-reflag(z,"variable",unique(z$variable),labcat)}
+
+unique(z$contname)
+if(!is.null(labcont)){
+z<-reflag(z,"contname",unique(z$contname),labcont)}
+
+head(z)
+z<-chclass(z,"contval","num")
+p<-ggplot(z,aes(x=value,y=contval))+
+         geom_boxplot(outlier.shape = NA)+
+         geom_point(col="grey",alpha=0.1)+
+         facet_grid(contname~variable,scales = "free")+
+         thm+
+         xlab(xtit)+ylab(ytit)
+p
+}
+
+
+#' ggplot themes
+#'
+#' tips for plot
+#' @keywords ggplot.theme
+#' @export
+#' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
+#' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
+
+ggplot.theme<-function(...){
+  thm<-theme(strip.text = element_text(size =12, colour ="black"),
+  legend.title = element_blank(),
+  panel.grid.minor = element_blank(),
+  axis.text.x  = element_text(vjust=0, size=12,angle = 90),
+  axis.text.y  = element_text(size=12),
+  axis.title  = element_text(size=12),
+  legend.position="top",legend.text.align = 0,legend.text=element_text(size=12),
+  scale_color_manual(name="",values=certara_pal(),
+  labels=c("t","t1","t2")),
+  guides(linetype=guide_legend(title=""),
+           col=guide_legend(title="")))}
+
+
 #' Tips for plot
 #'
 #' tips for plot
