@@ -12,7 +12,7 @@ lh_cwres_x(
   scale = c(0.1, 100),
   PREDN = "Population Predicted Concentration (ng/mL)",
   CWRESN = "Conditional Weighted Residuals",
-  col.obs = "#A6CEE3",
+  col.obs = "grey",
   col.ident = "#1F78B4",
   strat = NULL,
   smooth = "loess"

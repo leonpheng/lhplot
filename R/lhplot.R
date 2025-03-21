@@ -1180,9 +1180,9 @@ lh_cwres_time<-function(data,y="CWRES",
 #' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 
 lh_cwres_x<-function (data, y = "CWRES", x = "PREDN", type = "log", scale = c(0.1,
-                                                                              100), PREDN = "Population Predicted Concentration (ng/mL)",
-                      CWRESN = "Conditional Weighted Residuals", col.obs = "#A6CEE3",
-                      col.ident = "#1F78B4", strat = NULL,smooth="loess")
+                    100), PREDN = "Population Predicted Concentration (ng/mL)",
+                     CWRESN = "Conditional Weighted Residuals", col.obs = "grey",
+                     col.ident = "#1F78B4", strat = NULL, smooth = "loess")
 {
   if (!is.null(strat)) {
     cw <- data[, c(x, y, strat)]
@@ -1204,29 +1204,29 @@ lh_cwres_x<-function (data, y = "CWRES", x = "PREDN", type = "log", scale = c(0.
   }
   cols <- c(Observed = col.obs)
   cols1 <- c(Identity = col.ident)
+
   if (is.null(strat)) {
-    p <- ggplot2::ggplot(cw, aes(x = x, y = y)) + geom_point(aes(col =cols)) +
+    p <- ggplot2::ggplot(cw, aes(x = x, y = y)) + geom_point(col = "grey") +
       xlab(PREDN) + ylab(CWRESN) + geom_hline(aes(yintercept = 0),
-                                              linetype = "solid") + geom_hline(yintercept = c(-4, 4, -6, 6),
-          linetype = "dashed", col = "grey") + geom_smooth(method = smooth,
-                    method.args = list(span = 2/3, degree = 1, family = "symmetric"),
-          se = F, linetype = "dashed") + scale_x_continuous(labels = function(x) format(x,
-                                                                                                                                                                                                              scientific = F)) + scale_y_continuous(limits = c(-8,
-                                                                                                                                                                                                                                                               8), breaks = seq(-8, 8, 2)) + scale_linetype_discrete(name = "") +
+                                              linetype = "solid") + geom_hline(yintercept = c(-4,
+                                                                                              4, -6, 6), linetype = "dashed", col = "grey") +
+      geom_smooth(method = smooth,span=2,se=F, linetype = "dashed") +
+      scale_x_continuous(labels = function(x) format(x,
+                                                     scientific = F)) + scale_y_continuous(limits = c(-8,
+                                                                                                      8), breaks = seq(-8, 8, 2)) + scale_linetype_discrete(name = "") +
       guides(col = guide_legend(title = strat)) + theme_bw()
-  }  else {
+  } else {
     cbp1 <- c("#999999", "#E69F00", "#56B4E9", "#009E73",
               "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
     cw[, "strat"] <- factor(cw[, "strat"])
-    p <- ggplot2::ggplot(cw, aes(x = x, y = y)) + geom_point(aes(col = strat),alpha = 0.3) +
-      xlab(PREDN) + ylab(CWRESN) + geom_hline(aes(yintercept = 0),
-                                              linetype = "solid") + geom_hline(yintercept = c(-4, 4, -6, 6), linetype = "dashed", col = "grey") + geom_smooth(method = smooth,
-                                                                                                                                                              method.args = list(span = 2/3, degree = 1, family = "symmetric"),
-                                                                                                                                                              se = F, linetype = "dashed") + scale_x_continuous(labels = function(x) format(x,
-                                                                                                                                                                                                                                            scientific = F)) + scale_y_continuous(limits = c(-8,
-                                                                                                                                                                                                                                                                                             8), breaks = seq(-8, 8, 2)) +
-      #scale_colour_manual(name = "Observed",values = cbp1) + scale_linetype_discrete(name = "") +
-      theme_bw()
+    p <- ggplot2::ggplot(cw, aes(x = x, y = y)) + geom_point(aes(col = strat),
+                                                             alpha = 0.3) + xlab(PREDN) + ylab(CWRESN) + geom_hline(aes(yintercept = 0),
+                                                                                                                    linetype = "solid") + geom_hline(yintercept = c(-4,
+                                                                                                                                                                    4, -6, 6), linetype = "dashed", col = "grey") +
+      geom_smooth(method = smooth,span=2,se=F,linetype = "dashed") +
+      scale_x_continuous(labels = function(x) format(x,
+                                                     scientific = F)) + scale_y_continuous(limits = c(-8,
+                                                                                                      8), breaks = seq(-8, 8, 2)) + theme_bw()
   }
   p
 }
@@ -1308,24 +1308,71 @@ lh_cwres_pred<-function(data,y="CWRES",
 #' @keywords lh_gof
 #' @export
 #' @examples lh_gof("test.png")
-#' @examples lh_gof()
+#' @examples lh_gof() need PRED, IPRED, DV, time, TAD,CWRES
 #' @example  Tips: axis label: use expression for subscript "brackets" or superscript "hat"
 #' @example  Greek unicode slash and U03 then B1=alpha, B2=beta, B3=gamma, B4=delta, B5=epsilon, B7=eta, B8=tetha, BA=kappa, BB=lambda, BC=mu, C1=rho, C3=sigma, C4=tau, C9=omega
 
-lh_gof<-function(file.name=NULL){
-p1<-lh_dv_ipred(dat1,type="lin",IPREDN="IPRED")
-p2<-lh_dv_ipred(dat1,type="log")
-p3<-lh_dv_pred(dat1,type="lin")
-p4<-lh_dv_pred(dat1,type="log")
-p5<-lh_cwres_time(dat1)
-p6<-lh_cwres_pred(dat1)
-if(is.null(file.name)){
-p<-ggpubr::ggarrange(p1,p3,p5,p2,p4,p6,ncol=3, nrow=2, common.legend = TRUE, legend="bottom")
-}else{
-  ggsave(file.name,
-         ggpubr::ggarrange(p1,p3,p5,p2,p4,p6,ncol=3, nrow=2, common.legend = TRUE, legend="bottom"),dpi = 300, width =12, height = 8,units = c("in"))
-}
-p
+lh_gof<-function(dat=res,sortby="STUDYID",
+                 pn="GOFoverall.png",
+                 #ppn="GOF_cwres_npde_overall.png",
+                 foot="Note: for legibility, observations at TAD>100 h and prediction failures were not displayed",
+                 xtit1 = "Individual Predicted\n Concentration (ng/mL)",
+                 ytit1 = "Observed Concentration\n (ng/mL)",
+                 xtit2 = "Population Predicted\n Concentration (ng/mL)",
+                 ytit2 = "Observed Concentration\n (ng/mL)",
+                 ytit3="Normalized Prediction\n Distribution Errors",
+                 path="./",
+                 cwres1=c("CWRES","PRED","Conditional Weighted Residuals","Population Predicted\n Concentration (ng/mL)"),
+                 cwres2=c("CWRES","TAD","Conditional Weighted Residuals","Time after dose (h)")
+               ){
+
+  png(paste0(path,"qq.png"))
+  qqplot.cwres(res,"CWRES")
+  dev.off()
+  library(ggcertara)
+  library(ggpubr)
+
+  thm=theme(axis.text.x  = element_text(size=10,angle =0),
+            axis.text.y  = element_text(size=10),
+            axis.title  = element_text(size=14),
+            strip.text = element_text(size = 14, colour = "black"),
+            legend.position="bottom",legend.title= element_blank())
+
+ # xmin<-floor(min(dat$DV,dat$IPRED,dat$PRED))
+#  xmax<-ceiling(max(dat$DV,dat$IPRED,dat$PRED))
+
+  p1o<-lh_dv(dat,type = "lin",sortby  = sortby,xtit=xtit1,ytit=ytit1)+thm+scale_color_manual(values=certara_pal())
+  p1oa<-lh_dv(dat,type = "log",sortby = sortby,xtit=xtit1,ytit=ytit1)+thm+scale_color_manual(values=certara_pal())
+  p2o<-lh_dv(dat,type = "lin",x="PRED",y="DV",xtit=xtit2,ytit=ytit2,sortby = sortby)+thm+scale_color_manual(values=certara_pal())
+  p2oa<-lh_dv(dat,type ="log",x="PRED",y="DV",xtit=xtit2,ytit=ytit2,sortby = sortby)+thm+scale_color_manual(values=certara_pal())
+  p3o<-lh_cwres_x(dat,x =cwres1[2],y=cwres1[1],PREDN=cwres1[3],CWRESN =cwres1[4],strat = sortby)+thm+scale_color_manual(values=certara_pal())
+  #p3oa<-lh_cwres_x(dat,x = "time",PREDN= "Time after first dose (h)",strat = sortby)+thm+scale_color_manual(values=certara_pal())
+  p3ob<-lh_cwres_x(dat,x =cwres2[2],y=cwres2[1],PREDN=cwres2[3],CWRESN =cwres2[4],strat =sortby)+thm+scale_color_manual(values=certara_pal())
+
+  #A6CEE3
+  head(dat)
+
+  #p4o<-lh_cwres_x1(dat,x = "PRED",y = "npde",PREDN= "Population Predicted (ng/mL)",CWRESN=ytit3,strat = sortby)+thm+scale_color_manual(values=certara_pal())
+  #p4oa<-lh_cwres_x1(dat,x = "time",y = "npde",PREDN= "Time after first dose (h)",CWRESN=ytit3,strat =sortby)+thm+scale_color_manual(values=certara_pal())
+  #p4ob<-lh_cwres_x1(dat,x = "TAD",y = "npde",PREDN= "Time after dose (h)",CWRESN=ytit3,strat =sortby)+thm+scale_color_manual(values=certara_pal())
+  note<-foot
+
+  p <- ggarrange(p1o,p2o,p3o,p1oa,p2oa,p3ob, ncol = 3,
+                 nrow = 2, common.legend = TRUE, legend = "bottom")
+  p <-annotate_figure(p,bottom = text_grob(note, color = "blue",
+                                           hjust = 2, x = 1, face = "italic", size = 10))
+  #pp <-ggarrange(p3o,p3oa,p3ob,p4o,p4oa,p4ob, ncol = 3,
+  #               nrow = 2, common.legend = TRUE, legend = "bottom")
+  #pp <-annotate_figure(pp,bottom = text_grob(note, color = "blue",
+  #    hjust = 2, x = 1, face = "italic", size = 10))
+
+  nm<-paste0("./",pn)
+  #nm1<-paste0("./",run,"/",ppn)
+
+  ggsave(nm,p,
+         dpi = 300, width =15, height = 9, units = c("in"))
+  #ggsave(nm1, pp,
+  #dpi = 300, width = 15, height = 9, units = c("in"))
 }
 
 ####BOXPLOT

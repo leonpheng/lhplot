@@ -4,7 +4,22 @@
 \alias{lh_gof}
 \title{SAVE BATCH PLOTS}
 \usage{
-lh_gof(file.name = NULL)
+lh_gof(
+  dat = res,
+  sortby = "STUDYID",
+  pn = "GOFoverall.png",
+  foot =
+    "Note: for legibility, observations at TAD>100 h and prediction failures were not displayed",
+  xtit1 = "Individual Predicted\\n Concentration (ng/mL)",
+  ytit1 = "Observed Concentration\\n (ng/mL)",
+  xtit2 = "Population Predicted\\n Concentration (ng/mL)",
+  ytit2 = "Observed Concentration\\n (ng/mL)",
+  ytit3 = "Normalized Prediction\\n Distribution Errors",
+  path = "./",
+  cwres1 = c("CWRES", "PRED", "Conditional Weighted Residuals",
+    "Population Predicted\\n Concentration (ng/mL)"),
+  cwres2 = c("CWRES", "TAD", "Conditional Weighted Residuals", "Time after dose (h)")
+)
 }
 \arguments{
 \item{data}{data frame}
@@ -14,6 +29,6 @@ Generate GOF1
 }
 \examples{
 lh_gof("test.png")
-lh_gof()
+lh_gof() need PRED, IPRED, DV, time, TAD,CWRES
 }
 \keyword{lh_gof}
